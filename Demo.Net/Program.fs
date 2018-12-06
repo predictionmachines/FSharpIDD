@@ -31,7 +31,7 @@ let main argv =
         {
              curve3 with
                 Name = "Curve 3"
-                Thickness = 1.0
+                Thickness = 3.0
         }
 
     let chart =
