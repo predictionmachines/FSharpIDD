@@ -8,7 +8,7 @@
     <ProjectGuid>91cd065c-1e0b-4081-884c-61f333532d18</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Demo</RootNamespace>
-    <AssemblyName>FSharpIDD</AssemblyName>
+    <AssemblyName>FSharpIDD.WS</AssemblyName>
     <WebSharperProject>Library</WebSharperProject>
     <!--<WebSharperBundleOutputDir>Content</WebSharperBundleOutputDir>-->
     <WebSharperDeadCodeElimination>False</WebSharperDeadCodeElimination>
@@ -53,8 +53,12 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
-    <Compile Include="Html.fs" />
-    <Compile Include="FSharpIDD.fs" />
+    <Compile Include="..\FSharpIDD\Html.fs">
+      <Link>Html.fs</Link>
+    </Compile>
+    <Compile Include="..\FSharpIDD\FSharpIDD.fs">
+      <Link>FSharpIDD.fs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

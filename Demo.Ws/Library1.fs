@@ -6,7 +6,7 @@ open FSharpIDD.Plot.Polyline
 
 open WebSharper
 
-[<assembly: WebSharper.JavaScriptExport("FSharpIDD")>]
+[<assembly: WebSharper.JavaScriptExport("FSharpIDD.WS")>]
 do ()
 
 [<JavaScript>]

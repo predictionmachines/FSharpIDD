@@ -79,9 +79,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FSharpIDD.WS\FSharpIDD.WS.fsproj">
-      <Name>FSharpIDD.WS</Name>
-      <Project>{91cd065c-1e0b-4081-884c-61f333532d18}</Project>
+    <ProjectReference Include="..\FSharpIDD\FSharpIDD.fsproj">
+      <Name>FSharpIDD</Name>
+      <Project>{25a5b556-d6ca-4086-81eb-6a711d15200e}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
