@@ -35,8 +35,8 @@ let getChart() =
     let curve3 =
         {
              curve3 with
-                Name = Some("Curve 3")
-                Thickness = Some(1.0)
+                Name = "Curve 3"
+                Thickness = 3.0
         }
 
     let chart =
