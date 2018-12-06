@@ -1,7 +1,15 @@
-﻿namespace FsharpIDD
+﻿namespace FSharpIDD
+
+open WebSharper
+
+[<AutoOpen>]
+module Conversions =
+    [<Inline "$0 % 256">]
+    let inline byte x = byte x
 
 /// This module is to reduce the dependencies count and to ease possible WebSharper compilation
-module Colour =    
+[<JavaScript>]
+module Colour =        
     type Colour = {
         R: byte
         G: byte
@@ -14,9 +22,10 @@ module Colour =
     let Green = createColour (byte 0) (byte 255) (byte 0)
     let Blue = createColour (byte 0) (byte 0) (byte 255)
 
-module Plot =            
+[<JavaScript>]
+module Plot =    
     type DataSeries = float seq
-
+    
     module Polyline =
         /// The single polyline settings
         type Plot = {
@@ -31,7 +40,7 @@ module Plot =
             /// The line thickness of the polyline
             Thickness: float option
         }
-
+        
         type Options() =
             let mutable name: string option = None
             let mutable colour: Colour.Colour option = None
@@ -92,20 +101,17 @@ module Plot =
                     Thickness = Some(thickness)
             }
 
-
     type Plot =
     |   Polyline of Polyline.Plot
 
     type SizeType = int
 
-module Chart =
-    open System.Xml
-    open System.IO
-    open System.Text
-
-    open Plot
+[<JavaScript>]
+module Chart =        
+    open Plot    
 
     /// Represents single chart that can be transformed later into the HTML IDD Chart
+    [<ReflectedDefinition>]
     type Chart = {
         /// The width and height of the chart in pixels
         Size: (SizeType * SizeType) option // width * Height
@@ -130,39 +136,21 @@ module Chart =
                 Plots = Polyline(polyline)::chart.Plots
         }
     
+    open Html
 
-    let toHTML (chart:Chart) = 
-        let root = XmlDocument()
+    let toHTML (chart:Chart) =         
+        let chartNode =
+            createDiv()
+            |> addAttribute "class" "fsharp-idd" 
+            |> addAttribute "data-idd-plot" "chart" 
+            |> addAttribute "style" "width: 800px; height: 600px;"
 
-        let chartNode = root.CreateElement("div")
-        root.AppendChild(chartNode) |> ignore
-
-        let chartClassAttribure = root.CreateAttribute("class")
-        chartClassAttribure.AppendChild(root.CreateTextNode("fsharp-idd")) |> ignore
-        chartNode.Attributes.Append(chartClassAttribure) |> ignore
-
-        let chartPlotAttr = root.CreateAttribute("data-idd-plot")
-        chartPlotAttr.AppendChild(root.CreateTextNode("chart")) |> ignore
-        chartNode.Attributes.Append(chartPlotAttr) |> ignore
-    
-        let styleAttribute = root.CreateAttribute("style")
-        styleAttribute.AppendChild(root.CreateTextNode("width: 800px; height: 600px;")) |> ignore
-        chartNode.Attributes.Append(styleAttribute) |> ignore
-
-        let polylineToDom (p:Polyline.Plot) =
+        let polylineToDiv (p:Polyline.Plot) =
             let getDataDom xSeries ySeries =
-                let builder = StringBuilder()
-                builder.AppendLine("\tx\ty") |> ignore
-                Seq.iter2 (fun x y -> builder.AppendLine(sprintf "\t%f\t%f" x y) |> ignore) xSeries ySeries
-                builder.ToString()
-
-            let resultNode = root.CreateElement("div")
-
-            let plotAttribute = root.CreateAttribute("data-idd-plot")
-            plotAttribute.AppendChild(root.CreateTextNode("polyline")) |> ignore
-            resultNode.Attributes.Append(plotAttribute) |> ignore
-
-            let plotStyleAttribute = root.CreateAttribute("data-idd-style")
+                // can't use string builder here as it is not transpilable with WebSharper
+                let str = Seq.fold2 (fun state x y -> state + (sprintf "\t%f\t%f\n" x y)) "\tx\ty\n" xSeries ySeries                                
+                str
+            
             let styleEntries = []
             let styleEntries = 
                 match p.Thickness with
@@ -171,31 +159,29 @@ module Chart =
             let styleEntries = 
                 match p.Colour with
                 | Some(c) -> (sprintf "stroke: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
-                | None -> styleEntries            
-            plotStyleAttribute.AppendChild(root.CreateTextNode(System.String.Join("; ",styleEntries))) |> ignore
-            resultNode.Attributes.Append(plotStyleAttribute) |> ignore
+                | None -> styleEntries                     
+            let styleValue = System.String.Join("; ",styleEntries)
 
-            match p.Name with
-            | Some(name) ->
-                let nameAttribute = root.CreateAttribute("data-idd-name")
-                nameAttribute.AppendChild(root.CreateTextNode(name)) |> ignore
-                resultNode.Attributes.Append(nameAttribute) |> ignore
-            | None -> ()
-
-            resultNode.InnerText <- (getDataDom p.X p.Y)
+            let resultNode =
+                createDiv()
+                |> addAttribute "data-idd-plot" "polyline"
+                |> addAttribute "data-idd-style" styleValue
+                |> addText (getDataDom p.X p.Y)
+                        
+            let resultNode =
+                match p.Name with
+                | Some(name) -> resultNode |> addAttribute "data-idd-name" name                
+                | None -> resultNode            
 
             resultNode
     
-        let plotToDom plot =
+        let plotToDiv plot =
             match plot with
-            |   Polyline p -> polylineToDom p
+            |   Polyline p -> polylineToDiv p
 
-        let plotElems = chart.Plots |> Seq.map plotToDom
-        plotElems |> Seq.iter (fun elem -> chartNode.AppendChild(elem) |> ignore)
-        use writer = new StringWriter()
-        use xmlWriter = new XmlTextWriter(writer)
-        root.WriteContentTo(xmlWriter)
-        let res = writer.ToString()
-        res
+        let plotElems = chart.Plots |> Seq.map plotToDiv
+        let chartNode = Seq.fold (fun state elem -> addDiv elem state) chartNode plotElems
+        
+        divToStr chartNode
 
     

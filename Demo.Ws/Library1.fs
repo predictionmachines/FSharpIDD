@@ -1,13 +1,16 @@
-﻿open FsharpIDD.Chart
-open FsharpIDD.Plot
-open FsharpIDD.Plot.Polyline
-open System.IO
-open System.Diagnostics
-open FsharpIDD
-open System.Security
+﻿module Demo
 
-[<EntryPoint>]
-let main argv = 
+open FSharpIDD
+open FSharpIDD.Chart
+open FSharpIDD.Plot.Polyline
+
+open WebSharper
+
+[<assembly: WebSharper.JavaScriptExport("FSharpIDD")>]
+do ()
+
+[<JavaScript>]
+let getChart() =
     // fake data generation
     let Xseries = Array.init 1000 (fun i -> float(i+1)*0.01)
 
@@ -18,7 +21,7 @@ let main argv =
     // Specifying some of the polyline options with setOption call
     let curve1 =
         createPolyline Xseries Yseries1
-        |> setOptions (Options(Name = "Curve 1", Thickness = 3.0))
+        |> setOptions (Options(Name = "Curve 1"))
     
     // Specifying some of the polyline options with a series of set... calls
     let curve2 = 
@@ -44,15 +47,4 @@ let main argv =
 
     // getting HTML that represents the chart
     let generatedChart = chart |> toHTML
-
-    let template = File.ReadAllText "template.html"
-
-    // Injecting it into the HTML template
-    let html = template.Replace("<%PLACEHOLDER%>",generatedChart)
-    printfn "%s" generatedChart
-    let writer = File.CreateText("chart.html")
-    writer.Write(html)
-    writer.Close()
-    // showing the result HTML with browser
-    Process.Start("chart.html") |> ignore
-    0
+    generatedChart

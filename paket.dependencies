@@ -1,0 +1,4 @@
+source https://nuget.org/api/v2
+
+nuget WebSharper.FSharp // = 4.0.194.126
+nuget FSharp.Core ~> 4.3.4
