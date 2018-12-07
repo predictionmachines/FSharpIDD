@@ -14,10 +14,11 @@
     <DefineConstants>NET462;NETFULL</DefineConstants>
   </PropertyGroup>-->
   <ItemGroup>
-    <None Include="packages.config" />
     <Compile Include="WebSharperStub.fs" />
     <Compile Include="Html.fs" />
     <Compile Include="FSharpIDD.fs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="4.3.4" />
+  </ItemGroup>
 </Project>
