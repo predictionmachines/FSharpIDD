@@ -2,7 +2,7 @@
 
 open FSharpIDD
 open FSharpIDD.Chart
-open FSharpIDD.Plot.Polyline
+open FSharpIDD.Plots.Polyline
 
 open WebSharper
 

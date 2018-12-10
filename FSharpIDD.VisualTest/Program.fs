@@ -2,9 +2,9 @@
 open System.Diagnostics
 open FSharpIDD
 open CollectionToHtml
-open FSharpIDD.Plot
+open FSharpIDD.Plots
 open FSharpIDD.Chart
-open FSharpIDD.Plot.Polyline
+open FSharpIDD.Plots.Polyline
 open FSharpIDD.Colour
 
 [<EntryPoint>]
