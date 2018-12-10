@@ -1,5 +1,8 @@
 # F# API for Interactive Data Display
 
+![Nuget version shield](https://img.shields.io/nuget/v/FSharpIDD.svg)
+![Nuget downloads shield](https://img.shields.io/nuget/dt/FSharpIDD.svg)
+
 Provides a way to compose a chart in F# and easily get embeddable HTML presenting this chart.
 
 ## Usage example
