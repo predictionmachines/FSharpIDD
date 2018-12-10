@@ -27,7 +27,7 @@ module Colour =
     let Blue = createColour (byte 0) (byte 0) (byte 255)
 
 [<JavaScript>]
-module Plot =    
+module Plots =    
     type DataSeries = float seq
     
     module Polyline =
@@ -45,7 +45,7 @@ module Plot =
 
         /// The single polyline settings
         type Plot = {
-            /// Specifies how to annotate the polyline in the legend
+            /// Specifies how to annotate the polyline in the legend. Null means that name is not set
             Name: string
             /// Series of X coords of the points that form the polyline
             X: DataSeries
@@ -158,7 +158,7 @@ module Plot =
 
 [<JavaScript>]
 module Chart =        
-    open Plot    
+    open Plots    
 
     /// Represents single chart that can be transformed later into the HTML IDD Chart    
     type Chart = {
@@ -179,9 +179,9 @@ module Chart =
     let Empty : Chart = {
         Width = 800
         Height = 600
-        Title = null
-        Xlabel = null
-        Ylabel = null
+        Title = null // null means not set
+        Xlabel = null // null means not set
+        Ylabel = null // null means not set
         Plots = []
     }    
 
