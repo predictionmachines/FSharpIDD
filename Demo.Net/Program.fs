@@ -39,6 +39,8 @@ let main argv =
         |> Chart.addPolyline curve1
         |> Chart.addPolyline curve2
         |> Chart.addPolyline curve3
+        |> Chart.setTitle "The demo chart"
+        |> Chart.setSize 400 200
 
     // getting HTML that represents the chart
     let generatedChart = chart |> toHTML

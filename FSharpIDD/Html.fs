@@ -42,6 +42,7 @@ module Html=
             Children = []
         }
 
+    /// Adds the text inside the div (inner content)
     let addText text div = 
         {
             div with

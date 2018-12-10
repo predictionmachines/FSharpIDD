@@ -160,31 +160,38 @@ module Plot =
 module Chart =        
     open Plot    
 
-    /// Represents single chart that can be transformed later into the HTML IDD Chart
-    [<ReflectedDefinition>]
+    /// Represents single chart that can be transformed later into the HTML IDD Chart    
     type Chart = {
-        /// The width and height of the chart in pixels
-        Size: (SizeType * SizeType) option // width * Height
+        /// The width of the chart in pixels
+        Width: int 
+        /// The height of the chart in pixels
+        Height: int
         /// The text that is centered and placed above the chart
-        Title: string option
-        Xlabel: string option
-        Ylabel: string Option
+        Title: string
+        /// The text which describes the X axis
+        Xlabel: string
+        /// The text which describes the Y axis
+        Ylabel: string
+        /// A collection of plots (polyline, markers, etc) to draw
         Plots: Plot list
     }
 
     let Empty : Chart = {
-        Size = None
-        Title = None
-        Xlabel = None
-        Ylabel = None
+        Width = 800
+        Height = 600
+        Title = null
+        Xlabel = null
+        Ylabel = null
         Plots = []
     }    
 
-    let addPolyline polyline chart =
-        {
-            chart with
-                Plots = Polyline(polyline)::chart.Plots
-        }
+    let addPolyline polyline chart = { chart with Plots = Polyline(polyline)::chart.Plots }
+
+    /// Sets the textual title that will be placed above the charting area
+    let setTitle title chart =  { chart with Title = title}
+
+    /// Sets the size of the chart in pixels
+    let setSize width height chart = {chart with Width = width; Height = height}
     
     open Html
 
@@ -193,7 +200,18 @@ module Chart =
             createDiv()
             |> addAttribute "class" "fsharp-idd" 
             |> addAttribute "data-idd-plot" "chart" 
-            |> addAttribute "style" "width: 800px; height: 600px;"
+            |> addAttribute "style" (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
+        
+        let chartNode = 
+            if chart.Title <> null then
+                let titleNode =
+                    createDiv()
+                    |> addAttribute "class" "idd-title"
+                    |> addAttribute "data-idd-placement" "top"
+                    |> addText chart.Title
+                chartNode |> addDiv titleNode
+            else
+                chartNode
 
         let polylineToDiv (p:Polyline.Plot) =
             let getDataDom xSeries ySeries =
