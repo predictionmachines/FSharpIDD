@@ -1,0 +1,11 @@
+﻿body {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content:flex-start;
+}
+
+.fsharp-idd {
+    width: 100px;
+    height: 50px;
+}
