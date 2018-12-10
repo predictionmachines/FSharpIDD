@@ -1,0 +1,17 @@
+﻿.test-samples-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.test-sample {
+    margin: 2em;
+}
+
+.test-sample-name {
+    font-weight: bold;
+    height: 6em;
+    max-width: 400px;
+    font-family: monospace;
+}
