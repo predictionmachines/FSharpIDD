@@ -40,7 +40,9 @@ let main argv =
         |> Chart.addPolyline curve2
         |> Chart.addPolyline curve3
         |> Chart.setTitle "The demo chart"
-        |> Chart.setSize 400 200
+        |> Chart.setSize 600 300
+        |> Chart.setXlabel "X"
+        |> Chart.setYlabel "Parameter value"
 
     // getting HTML that represents the chart
     let generatedChart = chart |> toHTML

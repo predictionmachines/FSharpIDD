@@ -191,7 +191,13 @@ module Chart =
     let setTitle title chart =  { chart with Title = title}
 
     /// Sets the size of the chart in pixels
-    let setSize width height chart = {chart with Width = width; Height = height}
+    let setSize width height chart = { chart with Width = width; Height = height}
+
+    /// Sets the X axis textual  label (placed below the X axis)
+    let setXlabel label chart = { chart with Xlabel = label}
+
+    /// Set the Y axis textual label (placed to the left of Y axis)
+    let setYlabel label chart = { chart with Ylabel = label}
     
     open Html
 
@@ -210,6 +216,32 @@ module Chart =
                     |> addAttribute "data-idd-placement" "top"
                     |> addText chart.Title
                 chartNode |> addDiv titleNode
+            else
+                chartNode
+
+        let chartNode = 
+            if chart.Xlabel <> null then
+                let labelNode =
+                    createDiv()
+                    |> addAttribute "class" "idd-horizontalTitle"
+                    |> addAttribute "data-idd-placement" "bottom"
+                    |> addText chart.Xlabel
+                chartNode |> addDiv labelNode
+            else
+                chartNode
+
+        let chartNode = 
+            if chart.Ylabel <> null then
+                let containerNode =
+                    let labelNode =
+                        createDiv()
+                        |> addAttribute "class" "idd-verticalTitle-inner"
+                        |> addText chart.Ylabel
+                    createDiv()
+                    |> addAttribute "class" "idd-verticalTitle"
+                    |> addAttribute "data-idd-placement" "left"
+                    |> addDiv labelNode                                        
+                chartNode |> addDiv containerNode
             else
                 chartNode
 

@@ -29,7 +29,7 @@ module Html=
         Valid str
 
     let internal guardText (str:string) : HtmlString = 
-        let validChars = [|'-';'['; ']'; '('; ')';':'; ';'; '.'; ','|]
+        let validChars = [|'-';'['; ']'; '('; ')';':'; ';'; '.'; ','; '%'|]
         if str.ToCharArray() |> Array.exists (fun c -> not(System.Char.IsWhiteSpace(c) || System.Char.IsLetterOrDigit(c) || (Array.contains c validChars)) ) then
             raise(System.ArgumentException(sprintf "the string must contain only letters, digits or %A, but %s was passed" validChars str))
         Valid str
