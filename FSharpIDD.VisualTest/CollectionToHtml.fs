@@ -7,16 +7,18 @@ let toHTML (sampleList: (string*string)list) =
     let root = XmlDocument()
 
     let samplesNode = root.CreateElement("div")
+    samplesNode.SetAttribute("class", "test-samples-container")
     root.AppendChild(samplesNode) |> ignore
 
     let arrangeSample sample =
         let (chartName: string, chartSample: string) = sample
 
         let sampleNode = root.CreateElement("div")
+        sampleNode.SetAttribute("class", "test-sample")
 
         let chartNameDiv = root.CreateElement("div")
+        chartNameDiv.SetAttribute("class", "test-sample-name")
         chartNameDiv.InnerText <- chartName
-        chartNameDiv.SetAttribute("style", "font-weight: bold")
         sampleNode.AppendChild(chartNameDiv) |> ignore
 
         let chartDiv = root.CreateDocumentFragment()

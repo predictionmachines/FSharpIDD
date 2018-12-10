@@ -228,7 +228,7 @@ module Chart =
                 let joinStr =
                     match p.LineJoin with
                     | Polyline.LineJoin.Miter -> "miter"
-                    | Polyline.LineJoin.Bevel -> "bavel"
+                    | Polyline.LineJoin.Bevel -> "bevel"
                     | Polyline.LineJoin.Round -> "round"
                 (sprintf "lineJoin: %s" joinStr)::styleEntries
             let styleEntries = 
