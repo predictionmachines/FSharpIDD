@@ -16,14 +16,14 @@ let main argv =
     // Specifying some of the polyline options with setOption call
     let curve1 =
         createPolyline Xseries Yseries1
-        |> setOptions (Options(Name = "Curve 1"))
+        |> setOptions (Options(Name = "Curve 1", Thickness = 30.0, LineCap=LineCap.Round))
     
     // Specifying some of the polyline options with a series of set... calls
     let curve2 = 
-        createPolyline Xseries Yseries2
+        createPolyline Xseries Yseries2        
         |> setName "Curve 2"
         |> setStrokeColour Colour.Green
-        |> setThickness 2.0
+        |> setThickness 10.0        
     
     // Specifying some of the polyline options with a record recreation
     let curve3 = createPolyline Xseries Yseries3
@@ -31,7 +31,7 @@ let main argv =
         {
              curve3 with
                 Name = "Curve 3"
-                Thickness = 3.0
+                Colour = Colour.Red
         }
 
     let chart =
@@ -39,6 +39,8 @@ let main argv =
         |> Chart.addPolyline curve1
         |> Chart.addPolyline curve2
         |> Chart.addPolyline curve3
+        |> Chart.setTitle "The demo chart"
+        |> Chart.setSize 400 200
 
     // getting HTML that represents the chart
     let generatedChart = chart |> toHTML

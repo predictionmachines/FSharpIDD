@@ -31,6 +31,18 @@ module Plot =
     type DataSeries = float seq
     
     module Polyline =
+        /// The cap (shape of ending) of the line
+        type LineCap =
+        |   Butt
+        |   Round
+        |   Square
+
+        /// The shape of joins of polyline's strait segments
+        type LineJoin =
+        |   Bevel
+        |   Round
+        |   Miter
+
         /// The single polyline settings
         type Plot = {
             /// Specifies how to annotate the polyline in the legend
@@ -41,14 +53,20 @@ module Plot =
             Y: DataSeries
             /// The fill colour of the polyline
             Colour: Colour.Colour
-            /// The line thickness of the polyline
+            /// The line thickness of the polyline in pixels
             Thickness: float
-        }
+            /// The cap (shape of ending) of the line
+            LineCap: LineCap
+            /// The shape of joins of polyline's strait segments
+            LineJoin: LineJoin
+            }
         
         type Options() =
             let mutable name: string option = None
             let mutable colour: Colour.Colour option = None
             let mutable thickness: float option = None
+            let mutable lineCap: LineCap option = None
+            let mutable lineJoin: LineJoin option = None
 
             member s.Name with set v = name <- Some(v)                
             member s.SpecifiedName with internal get() = name
@@ -56,7 +74,10 @@ module Plot =
             member s.SpecifiedColour with internal get() = colour
             member s.Thickness with set v = thickness <- Some(v)
             member s.SpecifiedThickness with internal get() = thickness
-                
+            member s.LineCap with set v = lineCap <- Some(v)
+            member s.SpecifiedLineCap with internal get() = lineCap
+            member s.LineJoin with set v = lineJoin <- Some(v)
+            member s.SpecifiedLineJoin with internal get() = lineJoin
     
         /// sets several polyline options at once
         let setOptions (options:Options) polyline =
@@ -72,18 +93,28 @@ module Plot =
                 match options.SpecifiedThickness with
                 | None -> polyline
                 | Some(thickness) -> {polyline with Thickness = thickness}
+            let polyline =
+                match options.SpecifiedLineCap with
+                | None -> polyline
+                | Some(cap) -> {polyline with LineCap = cap}
+            let polyline =
+                match options.SpecifiedLineJoin with
+                | None -> polyline
+                | Some(join) -> {polyline with LineJoin = join}
             polyline
         
 
 
         /// Creates a basic polyline using the specifies set of X and Y coords
-        let createPolyline x y =    
+        let createPolyline x y = 
                 {
                     X = x
                     Y = y
                     Colour = Colour.Default
                     Thickness = 1.0
                     Name = null
+                    LineCap = LineCap.Butt
+                    LineJoin = LineJoin.Miter
                 }
         /// Changes the name of the polyline (how it is depicted in the legend)
         let setName name polyline =
@@ -98,11 +129,26 @@ module Plot =
                 polyline with
                     Colour = colour
             }
-
+        
+        /// Sets the line thickness in pixels
         let setThickness thickness polyline =
             {
                 polyline with
                     Thickness = thickness
+            }
+        
+        /// Sets the shape of polyline caps (line endings)
+        let setLineCap capType polyline =
+            {
+                polyline with
+                    LineCap = capType
+            }
+
+        /// Sets the shape of polyline strait segment joins
+        let setLineJoin joinType polyline =
+            {
+                polyline with
+                    LineJoin = joinType
             }
 
     type Plot =
@@ -114,31 +160,38 @@ module Plot =
 module Chart =        
     open Plot    
 
-    /// Represents single chart that can be transformed later into the HTML IDD Chart
-    [<ReflectedDefinition>]
+    /// Represents single chart that can be transformed later into the HTML IDD Chart    
     type Chart = {
-        /// The width and height of the chart in pixels
-        Size: (SizeType * SizeType) option // width * Height
+        /// The width of the chart in pixels
+        Width: int 
+        /// The height of the chart in pixels
+        Height: int
         /// The text that is centered and placed above the chart
-        Title: string option
-        Xlabel: string option
-        Ylabel: string Option
+        Title: string
+        /// The text which describes the X axis
+        Xlabel: string
+        /// The text which describes the Y axis
+        Ylabel: string
+        /// A collection of plots (polyline, markers, etc) to draw
         Plots: Plot list
     }
 
     let Empty : Chart = {
-        Size = None
-        Title = None
-        Xlabel = None
-        Ylabel = None
+        Width = 800
+        Height = 600
+        Title = null
+        Xlabel = null
+        Ylabel = null
         Plots = []
     }    
 
-    let addPolyline polyline chart =
-        {
-            chart with
-                Plots = Polyline(polyline)::chart.Plots
-        }
+    let addPolyline polyline chart = { chart with Plots = Polyline(polyline)::chart.Plots }
+
+    /// Sets the textual title that will be placed above the charting area
+    let setTitle title chart =  { chart with Title = title}
+
+    /// Sets the size of the chart in pixels
+    let setSize width height chart = {chart with Width = width; Height = height}
     
     open Html
 
@@ -147,20 +200,44 @@ module Chart =
             createDiv()
             |> addAttribute "class" "fsharp-idd" 
             |> addAttribute "data-idd-plot" "chart" 
-            |> addAttribute "style" "width: 800px; height: 600px;"
+            |> addAttribute "style" (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
+        
+        let chartNode = 
+            if chart.Title <> null then
+                let titleNode =
+                    createDiv()
+                    |> addAttribute "class" "idd-title"
+                    |> addAttribute "data-idd-placement" "top"
+                    |> addText chart.Title
+                chartNode |> addDiv titleNode
+            else
+                chartNode
 
         let polylineToDiv (p:Polyline.Plot) =
             let getDataDom xSeries ySeries =
                 // can't use string builder here as it is not transpilable with WebSharper
                 let str = Seq.fold2 (fun state x y -> state + (sprintf "\t%f\t%f\n" x y)) "\tx\ty\n" xSeries ySeries                                
                 str
-            
-            let styleEntries = []
-            let styleEntries = (sprintf "thickness: %.1f" p.Thickness)::styleEntries
+                        
+            let styleEntries = [ sprintf "thickness: %.1f" p.Thickness ]
             let styleEntries = 
                 match p.Colour with
                 | Colour.Rgb c -> (sprintf "stroke: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
                 | Colour.Default -> styleEntries                     
+            let styleEntries = 
+                let joinStr =
+                    match p.LineJoin with
+                    | Polyline.LineJoin.Miter -> "miter"
+                    | Polyline.LineJoin.Bevel -> "bavel"
+                    | Polyline.LineJoin.Round -> "round"
+                (sprintf "lineJoin: %s" joinStr)::styleEntries
+            let styleEntries = 
+                let capStr =
+                    match p.LineCap with
+                    | Polyline.LineCap.Butt -> "butt"
+                    | Polyline.LineCap.Round -> "round"
+                    | Polyline.LineCap.Square -> "square"
+                (sprintf "lineCap: %s" capStr)::styleEntries
             let styleValue = System.String.Join("; ",styleEntries)
 
             let resultNode =

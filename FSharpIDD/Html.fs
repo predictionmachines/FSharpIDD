@@ -2,7 +2,7 @@
 
 open WebSharper
 
-/// The module provides basic HTML dom composing needed for IDD declarative chart creation iwthout any external dependencies
+/// The module provides basic HTML dom composing needed for IDD declarative chart creation without any external dependencies
 [<JavaScript>]
 module Html=
 
@@ -42,6 +42,7 @@ module Html=
             Children = []
         }
 
+    /// Adds the text inside the div (inner content)
     let addText text div = 
         {
             div with
