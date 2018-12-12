@@ -357,8 +357,14 @@ module Chart =
     /// Sets the X axis textual  label (placed below the X axis)
     let setXlabel label chart = { chart with Xlabel = label}
 
+    /// Sets the mode of X axis
+    let setXaxis axisMode chart = {chart with Xaxis = axisMode}
+
     /// Set the Y axis textual label (placed to the left of Y axis)
     let setYlabel label chart = { chart with Ylabel = label}
+
+    /// Sets the mode of Y axis
+    let setYaxis axisMode chart = { chart with Yaxis = axisMode}
 
     /// Set the mode of grid lines appearance
     let setGridLines gridLines chart = {chart with GridLines = gridLines}
