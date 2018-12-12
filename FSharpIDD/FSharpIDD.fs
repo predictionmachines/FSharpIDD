@@ -7,6 +7,12 @@ module Conversions =
     [<Inline "$0 % 256">]
     let inline byte x = byte x
 
+module Utils =
+    [<Inline "Math.floor(new Date().valueOf() * Math.random()).toString()">]
+    let getUniqueId(): string = 
+        System.Guid.NewGuid().ToString()
+
+
 /// This module is to reduce the dependencies count and to ease possible WebSharper compilation
 [<JavaScript>]
 module Colour =    
@@ -25,6 +31,7 @@ module Colour =
     let Red = createColour (byte 255) (byte 0) (byte 0)
     let Green = createColour (byte 0) (byte 255) (byte 0)
     let Blue = createColour (byte 0) (byte 0) (byte 255)
+    let DarkGrey = createColour (byte 0xA9) (byte 0xA9) (byte 0xA9)
 
 [<JavaScript>]
 module Plots =    
@@ -159,6 +166,27 @@ module Plots =
 [<JavaScript>]
 module Chart =        
     open Plots    
+    open System
+
+    type Axis = 
+    /// The axis is disabled (not visible)
+    |   Hidden
+    /// Numeric axis of automatically calculated and placed numerical ticks with values
+    |   Numeric
+
+    type GridLines =
+    |   Disabled
+    |   Enabled of strokeColour: Colour.Colour * lineWidthPX: float
+
+    let DefaultGridLines = Enabled(Colour.DarkGrey, 1.0)
+
+    type LegendVisibility =
+    /// The legend is always visible (even if all of the plots are without names)
+    |   Visible
+    /// The legend is visible if some of the plots have their name set
+    |   Automatic
+    /// The legenit is not visible
+    |   Hidden
 
     /// Represents single chart that can be transformed later into the HTML IDD Chart    
     type Chart = {
@@ -170,10 +198,20 @@ module Chart =
         Title: string
         /// The text which describes the X axis
         Xlabel: string
-        /// The text which describes the Y axis
+        /// Which X axis to draw
+        Xaxis: Axis
+        /// The text which describes the Y axis        
         Ylabel: string
+        /// Which Y axis to draw
+        Yaxis: Axis
+        /// The appearance of grid lines
+        GridLines : GridLines
         /// A collection of plots (polyline, markers, etc) to draw
         Plots: Plot list
+        /// Whether the legend (list of plot names and their icons) is visible in the top-right part of the chart
+        IsLegendEnabled: LegendVisibility
+        /// Whether the chart visible area can be navigated with a mouse or touch gestures
+        IsNavigationEnabled: bool
     }
 
     let Empty : Chart = {
@@ -182,6 +220,11 @@ module Chart =
         Title = null // null means not set
         Xlabel = null // null means not set
         Ylabel = null // null means not set
+        Xaxis = Axis.Numeric
+        Yaxis = Axis.Numeric
+        GridLines = DefaultGridLines
+        IsLegendEnabled = Automatic
+        IsNavigationEnabled = false
         Plots = []
     }    
 
@@ -198,16 +241,87 @@ module Chart =
 
     /// Set the Y axis textual label (placed to the left of Y axis)
     let setYlabel label chart = { chart with Ylabel = label}
+
+    /// Set the mode of grid lines appearance
+    let setGridLines gridLines chart = {chart with GridLines = gridLines}
     
+    let setLegendEnabled isEnabled chart = {chart with IsLegendEnabled = isEnabled}
+
+    let setNavigationenabled isEnabled chart = {chart with IsNavigationEnabled = isEnabled}
+
     open Html
 
     let toHTML (chart:Chart) =
         let chartNode =
             createDiv()
             |> addAttribute "class" "fsharp-idd" 
-            |> addAttribute "data-idd-plot" "chart" 
+            |> addAttribute "data-idd-plot" "figure" 
             |> addAttribute "style" (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
         
+        let chartNode,yAxisID = 
+            match chart.Yaxis with
+            |   Axis.Hidden -> chartNode, Option.None
+            |   Axis.Numeric ->
+                let id = Utils.getUniqueId()
+                let axisNode =                    
+                    createDiv()
+                    |> addAttribute "id" id
+                    |> addAttribute "data-idd-axis" "numeric"
+                    |> addAttribute "data-idd-placement" "left"
+                    |> addAttribute "style" "position: relative;"                    
+                (chartNode |> addDiv axisNode),(Some id)
+
+        let chartNode,xAxisID = 
+            match chart.Xaxis with
+            |   Axis.Hidden -> chartNode, Option.None
+            |   Axis.Numeric ->
+                let id = Utils.getUniqueId()
+                let axisNode =                    
+                    createDiv()
+                    |> addAttribute "id" id
+                    |> addAttribute "data-idd-axis" "numeric"
+                    |> addAttribute "data-idd-placement" "bottom"
+                    |> addAttribute "style" "position: relative;"                    
+                (chartNode |> addDiv axisNode),(Some id)
+        
+        let chartNode =
+            match chart.GridLines with
+            |   GridLines.Enabled(colour,thickness) ->                
+                let gridNode =
+                    let styleEntries = [ sprintf "thickness: %.1fpx" thickness ]
+                    let styleEntries = 
+                        match colour with
+                        | Colour.Rgb c -> (sprintf "stroke: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
+                        | Colour.Default -> styleEntries 
+                    let styleValue = System.String.Join("; ",styleEntries)
+                    createDiv()
+                    |> addAttribute "data-idd-plot" "grid"
+                    |> addAttribute "data-idd-placement" "center"
+                    |> addAttribute "data-idd-style" styleValue
+                let gridNode = 
+                    match xAxisID with
+                    |   Some xId -> gridNode |> addAttribute "data-idd-xaxis" xId
+                    |   Option.None -> gridNode
+                let gridNode = 
+                    match yAxisID with
+                    |   Some yId -> gridNode |> addAttribute "data-idd-yaxis" yId
+                    |   Option.None -> gridNode
+                chartNode |> addDiv gridNode
+            |   GridLines.Disabled -> chartNode
+        
+        let effectiveLegendvisibility =
+            match chart.IsLegendEnabled with
+            |   Visible -> true
+            |   Hidden -> false
+            |   Automatic ->
+                let isNameDefined plot =
+                    match plot with
+                    |   Polyline p -> p.Name <> null                
+                List.exists isNameDefined chart.Plots
+
+        let chartNode = chartNode |> addAttribute "data-idd-legend-enabled" (if effectiveLegendvisibility then "true" else "false")            
+        let chartNode = chartNode |> addAttribute "data-idd-navigation-enabled" (if chart.IsNavigationEnabled then "true" else "false")            
+
         let chartNode = 
             if chart.Title <> null then
                 let titleNode =
