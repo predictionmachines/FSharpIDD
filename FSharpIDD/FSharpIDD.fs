@@ -110,9 +110,7 @@ module Plots =
                 | Some(join) -> {polyline with LineJoin = join}
             polyline
         
-
-
-        /// Creates a basic polyline using the specifies set of X and Y coords
+        /// Creates a basic polyline using the specified set of X and Y coords
         let createPolyline x y = 
                 {
                     X = x
@@ -123,6 +121,7 @@ module Plots =
                     LineCap = LineCap.Butt
                     LineJoin = LineJoin.Miter
                 }
+        
         /// Changes the name of the polyline (how it is depicted in the legend)
         let setName name polyline =
             {
@@ -158,8 +157,125 @@ module Plots =
                     LineJoin = joinType
             }
 
+    module Markers =
+        /// Marker primitives
+        type Shape =
+        |   Box
+        |   Circle
+        |   Diamond
+        |   Cross
+        |   Triangle
+
+        /// The single marker plot settings
+        type Plot = {
+            /// Specifies how to annotate markers in the legend. Null means that name is not set
+            Name: string
+            /// Series of X coords of the markers
+            X: DataSeries
+            /// Series of Y coords of the markers
+            Y: DataSeries
+            /// Specifies the size of one marker in pixels
+            Size: float
+            /// The markers fill colour
+            FillColour: Colour.Colour
+            /// The colour of the markers border
+            BorderColour: Colour.Colour
+            /// The shape of a marker
+            Shape: Shape
+        }
+        
+        type Options() =
+            let mutable name: string option = None
+            let mutable fillcolour: Colour.Colour option = None
+            let mutable bordercolour: Colour.Colour option = None
+            let mutable shape: Shape option = None
+            let mutable size: float option = None
+
+            member s.Name with set v = name <- Some(v)                
+            member s.SpecifiedName with internal get() = name
+            member s.FillColour with set v = fillcolour <- Some(v)
+            member s.SpecifiedFillColour with internal get() = fillcolour
+            member s.BorderColour with set v = bordercolour <- Some(v)
+            member s.SpecifiedBorderColour with internal get() = bordercolour
+            member s.Shape with set v = shape <- Some(v)
+            member s.SpecifiedShape with internal get() = shape
+            member s.Size with set v = size <- Some(v)
+            member s.SpecifiedSize with internal get() = size
+    
+        /// sets several markers options at once
+        let setOptions (options:Options) markers =
+            let markers =
+                match options.SpecifiedName with
+                | None -> markers
+                | Some(name) -> {markers with Name = name}
+            let markers =
+                match options.SpecifiedFillColour with
+                | None -> markers
+                | Some(fillcolour) -> {markers with FillColour = fillcolour}
+            let markers =
+                match options.SpecifiedBorderColour with
+                | None -> markers
+                | Some(bordercolour) -> {markers with BorderColour = bordercolour}
+            let markers =
+                match options.SpecifiedShape with
+                | None -> markers
+                | Some(shape) -> {markers with Shape = shape}
+            let markers =
+                match options.SpecifiedSize with
+                | None -> markers
+                | Some(size) -> {markers with Size = size}
+            markers
+        
+        /// Creates markers plot using the specified set of X and Y coords with default settings
+        let createMarkers x y = 
+                {
+                    X = x
+                    Y = y
+                    FillColour = Colour.Default
+                    BorderColour = Colour.Default
+                    Name = null
+                    Shape = Shape.Box
+                    Size = 10.0
+                }
+        
+        /// Changes the name of markers (how are they depicted in the legend)
+        let setName name markers =
+            {
+                markers with
+                    Name = name
+            }
+        
+        /// Changes the colour of a marker's border (how are they depicted in the legend)
+        let setBorderColour bordercolour markers =
+            {
+                markers with
+                    BorderColour = bordercolour
+            }
+        
+        /// Changes the colour with which a marker is filled (how are they depicted in the legend)
+        let setFillColour fillcolour markers =
+            {
+                markers with
+                    FillColour = fillcolour
+            }
+
+        /// Sets the shape of a marker
+        let setShape shapeType markers =
+            {
+                markers with
+                    Shape = shapeType
+            }
+
+        /// Sets the size of a marker
+        let setSize size markers =
+            {
+                markers with
+                    Size = size
+            }
+
     type Plot =
     |   Polyline of Polyline.Plot
+    |   Markers of Markers.Plot
 
     type SizeType = int
 
@@ -226,9 +342,11 @@ module Chart =
         IsLegendEnabled = Automatic
         IsNavigationEnabled = false
         Plots = []
-    }    
+    }
 
     let addPolyline polyline chart = { chart with Plots = Polyline(polyline)::chart.Plots }
+
+    let addMarkers markers chart = { chart with Plots = Markers(markers)::chart.Plots }
 
     /// Sets the textual title that will be placed above the charting area
     let setTitle title chart =  { chart with Title = title}
@@ -399,10 +517,56 @@ module Chart =
                     resultNode |> addAttribute "data-idd-name" p.Name  
 
             resultNode
+
+        let markersToDiv (m: Markers.Plot) =
+            let getDataDom xSeries ySeries =
+                // can't use string builder here as it is not transpilable with WebSharper
+                let str = Seq.fold2 (fun state x y -> state + (sprintf "\t%f\t%f\n" x y)) "\tx\ty\n" xSeries ySeries                                
+                str
+                    
+            // A number is a size in pixels
+            let styleEntries = [ sprintf "size: %.1f" m.Size ]
+
+            let styleEntries = 
+                match m.FillColour with
+                | Colour.Rgb c -> (sprintf "color: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
+                | Colour.Default -> styleEntries
+
+            let styleEntries = 
+                match m.BorderColour with
+                | Colour.Rgb c -> (sprintf "border: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
+                | Colour.Default -> styleEntries
+                
+            let styleEntries = 
+                let shapeStr =
+                    match m.Shape with
+                    | Markers.Shape.Box -> "box"
+                    | Markers.Shape.Circle -> "circle"
+                    | Markers.Shape.Cross -> "cross"
+                    | Markers.Shape.Diamond -> "diamond"
+                    | Markers.Shape.Triangle -> "triangle"
+                (sprintf "shape: %s" shapeStr)::styleEntries
+
+            let styleValue = System.String.Join("; ",styleEntries)
+
+            let resultNode =
+                createDiv()
+                |> addAttribute "data-idd-plot" "markers"
+                |> addAttribute "data-idd-style" styleValue
+                |> addText (getDataDom m.X m.Y)
+                        
+            let resultNode =
+                if System.String.IsNullOrEmpty m.Name then
+                    resultNode
+                else
+                    resultNode |> addAttribute "data-idd-name" m.Name  
+
+            resultNode
     
         let plotToDiv plot =
             match plot with
             |   Polyline p -> polylineToDiv p
+            |   Markers m -> markersToDiv m
 
         let plotElems = chart.Plots |> Seq.map plotToDiv
         let chartNode = Seq.fold (fun state elem -> addDiv elem state) chartNode plotElems
