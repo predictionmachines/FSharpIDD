@@ -55,6 +55,8 @@
     <Compile Include="CollectionToHtml.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <Compile Include="PolylineTests.fs" />
+    <Compile Include="MarkersTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
