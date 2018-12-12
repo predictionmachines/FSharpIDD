@@ -5,6 +5,7 @@ open CollectionToHtml
 open FSharpIDD.Plots
 open FSharpIDD.Chart
 open FSharpIDD.Plots.Polyline
+open FSharpIDD.Plots.Markers
 open FSharpIDD.Colour
 
 [<EntryPoint>]
@@ -49,7 +50,7 @@ let main argv =
     // Preset chart
     let presetChart = Chart.addPolyline blue20RoundRoundCurve Empty
     let presetChartStr = presetChart |> toHTML
-    let presetChartTest =
+    let presetPolylineTest =
         "2. This is a chart which properies are overridden in all of the next tests",
         [
             ""
@@ -62,7 +63,7 @@ let main argv =
     let noPropertiesSetCurve = Polyline.setOptions (Polyline.Options()) blue20RoundRoundCurve
     let noNewPropertiesSetChart = Chart.addPolyline noPropertiesSetCurve Empty
     let noNewPropertiesSetChartStr = noNewPropertiesSetChart |> toHTML
-    let setNoneTest =
+    let setNonePolylineTest =
         "3. Setting empty properties list",
         [
             "Polyline.setOptions(Polyline.Options())"
@@ -85,14 +86,14 @@ let main argv =
     
 
     // Specifying polyline thickness with setOptions call
-    let thicknessCurve = Polyline.setOptions (Polyline.Options(Thickness = 2.0)) blue20RoundRoundCurve
+    let thicknessCurve = Polyline.setOptions (Polyline.Options(Thickness = 5.0)) blue20RoundRoundCurve
     let thicknessCurveChart = Chart.addPolyline thicknessCurve Empty
     let thicknessCurveChartStr = thicknessCurveChart |> toHTML
-    let thicknessCurveChartStrTest =
+    let thicknessTest =
         "5. Specifying polyline thickness",
         [
-            "Polyline.setOptions(Polyline.Options(Thickness = 2.0))"
-            "The polyline with a 2px thick line"
+            "Polyline.setOptions(Polyline.Options(Thickness = 5.0))"
+            "The polyline with a 5px thick line"
         ],
         thicknessCurveChartStr
 
@@ -193,13 +194,108 @@ let main argv =
         axisCurveChartStr
 
 
+    // Default polyline via createMarkers
+    let basicPolylinePlot : Polyline.Plot = createPolyline Xseries Yseries1
+    let basicPolylineChart = Chart.addPolyline basicPolylinePlot Empty
+    let basicPolylineChartStr = basicPolylineChart |> toHTML
+    let basicPolylineTest =
+        "13. Default polyline via createMarkers",
+        [
+            "createPolyline Xseries Yseries1"
+            "Blue polyline 1px thick with no name specified in a legend"
+        ],
+        basicPolylineChartStr
+
+
+    // Markers
+    // Basic markers sample
+    let basicMarkersPlot : Markers.Plot = createMarkers Xseries Yseries1
+
+    // Basic markers sample chart
+    let basicMarkersChart = Chart.addMarkers basicMarkersPlot Empty
+    let basicMarkersChartStr = basicMarkersChart |> toHTML
+    let basicMarkersTest =
+        "14. Simple markers sample",
+        [
+            "createMarkers Xseries Yseries1"
+            "Box-shaped blue markers and a legend without markers name in it"
+        ],
+        basicMarkersChartStr
+    
+
+    // Specifying empty set of markers options with setOptions call
+    let emptyOptionsMarkers = Markers.setOptions(Markers.Options()) basicMarkersPlot
+    let emptyOptionsMarkersChart = Chart.addMarkers emptyOptionsMarkers Empty
+    let emptyOptionsMarkersChartStr = emptyOptionsMarkersChart |> toHTML
+    let emptyOptionsMarkersTest =
+        "15. Setting empty properties list",
+        [
+            "Markers.setOptions(Markers.Options())"
+            "Same markers as on the previous chart"
+        ],
+        emptyOptionsMarkersChartStr
+    
+
+    // Specifying markers name with setOptions call
+    let nameMarkersPlot = Markers.setOptions (Markers.Options(Name = "Markers")) basicMarkersPlot
+    let nameMarkersChart = Chart.addMarkers nameMarkersPlot Empty
+    let nameMarkersChartStr = nameMarkersChart |> toHTML
+    let nameMarkersTest =
+        "16. Specifying name of the markers",
+        [
+            "Markers.setOptions (Markers.Options(Name = 'Markers'))"
+            "Same markers as on the previous chart with a markers name in a legend "
+        ],
+        nameMarkersChartStr
+    
+
+    // Specifying markers border and fill colours with setOptions call
+    let borderFillMarkersPlot = Markers.setOptions (Markers.Options(BorderColour = Colour.Blue, FillColour = Colour.Green)) basicMarkersPlot
+    let borderFillMarkersPlotChart = Chart.addMarkers borderFillMarkersPlot Empty
+    let borderFillMarkersPlotChartStr = borderFillMarkersPlotChart |> toHTML
+    let borderFillMarkersTest =
+        "17. Specifying border and fill colours of the markers",
+        [
+            "Markers.setOptions (Markers.Options(BorderColour = Colour.Blue, FillColour = Colour.Green))"
+            "Markers are green with blue borders now "
+        ],
+        borderFillMarkersPlotChartStr
+    
+
+    // Specifying markers shape with setOptions call
+    let shapeMarkersPlot = Markers.setOptions (Markers.Options(Shape = Shape.Cross)) basicMarkersPlot
+    let shapeMarkersPlotChart = Chart.addMarkers shapeMarkersPlot Empty
+    let shapeMarkersPlotChartStr = shapeMarkersPlotChart |> toHTML
+    let shapeMarkersTest =
+        "17. Specifying shape of a marker",
+        [
+            "Markers.setOptions (Markers.Options(Shape = Shape.Cross))"
+            "Markers have a cross shape"
+        ],
+        shapeMarkersPlotChartStr
+    
+
+    // Specifying marker size with setOptions call
+    let sizeMarkersPlot = Markers.setOptions (Markers.Options(Size = 30.0)) basicMarkersPlot
+    let sizeMarkersPlotChart = Chart.addMarkers sizeMarkersPlot Empty
+    let sizeMarkersPlotChartStr = sizeMarkersPlotChart |> toHTML
+    let sizeMarkersTest =
+        "17. Specifying size of a marker",
+        [
+            "Markers.setOptions (Markers.Options(Size = 30.0))"
+            "Markers are 30px of a size"
+        ],
+        sizeMarkersPlotChartStr
+
+
+
     let tests = 
         [
             emptyChartTest
-            presetChartTest
-            setNoneTest
+            presetPolylineTest
+            setNonePolylineTest
             nameColourTest
-            thicknessCurveChartStrTest
+            thicknessTest
             squareMiterTest
             buttBevelTest
             setAllTest
@@ -207,6 +303,13 @@ let main argv =
             setThicknessSetLineCapSetLineJoinTest
             titleTest
             axisTest
+            basicPolylineTest
+            basicMarkersTest
+            emptyOptionsMarkersTest
+            nameMarkersTest
+            borderFillMarkersTest
+            shapeMarkersTest
+            sizeMarkersTest
         ]    
 
 
