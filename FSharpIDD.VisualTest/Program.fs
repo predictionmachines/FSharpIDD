@@ -40,7 +40,7 @@ let main argv =
     // Empty chart
     let emptyChartStr = Empty |> Chart.setSize 400 300 |> toHTML
     let emptyChartTest =
-        "1. Empty chart",
+        "Empty chart",
         [
             "|> Chart.setSize 400 300"
             "Chart has axes, grid lines. Is 400px wide, 300px tall"
@@ -51,7 +51,7 @@ let main argv =
     let presetChart = Chart.addPolyline blue20RoundRoundCurve Empty
     let presetChartStr = presetChart |> toHTML
     let presetPolylineTest =
-        "2. This is a chart which properies are overridden in all of the next tests",
+        "This is a chart which properies are overridden in all of the next tests",
         [
             ""
             "A blue polyline 20px thick with round cap, round join and a legend"
@@ -64,7 +64,7 @@ let main argv =
     let noNewPropertiesSetChart = Chart.addPolyline noPropertiesSetCurve Empty
     let noNewPropertiesSetChartStr = noNewPropertiesSetChart |> toHTML
     let setNonePolylineTest =
-        "3. Setting empty properties list",
+        "Setting empty properties list",
         [
             "Polyline.setOptions(Polyline.Options())"
             "Chart is the same as previous"
@@ -77,7 +77,7 @@ let main argv =
     let nameColourCurveChart = Chart.addPolyline nameColourCurve Empty
     let nameColourCurveChartStr = nameColourCurveChart |> toHTML
     let nameColourTest =
-        "4. Specifying name and colour",
+        "Specifying name and colour",
         [
             "Polyline.setOptions(Polyline.Options(Name = 'New Name', Colour = Colour.Green))"
             "The Green polyline with a name in a legend"
@@ -90,7 +90,7 @@ let main argv =
     let thicknessCurveChart = Chart.addPolyline thicknessCurve Empty
     let thicknessCurveChartStr = thicknessCurveChart |> toHTML
     let thicknessTest =
-        "5. Specifying polyline thickness",
+        "Specifying polyline thickness",
         [
             "Polyline.setOptions(Polyline.Options(Thickness = 5.0))"
             "The polyline with a 5px thick line"
@@ -103,7 +103,7 @@ let main argv =
     let squareMiterCurveChart = Chart.addPolyline squareMiterCurve Empty
     let squareMiterCurveChartStr = squareMiterCurveChart |> toHTML
     let squareMiterTest =
-        "6. Overriding line cap and line join properties",
+        "Overriding line cap and line join properties",
         [
             "Polyline.setOptions (Polyline.Options(LineCap = LineCap.Square, LineJoin = LineJoin.Miter))"
             "The polyline with a square line cap and miter line join"
@@ -116,7 +116,7 @@ let main argv =
     let buttBevelCurveChart = Chart.addPolyline buttBevelCurve Empty
     let buttBevelCurveChartStr = buttBevelCurveChart |> toHTML
     let buttBevelTest =
-        "7. Overriding line cap and line join properties",
+        "Overriding line cap and line join properties",
         [
             "Polyline.setOptions (Polyline.Options(LineCap = LineCap.Butt, LineJoin = LineJoin.Bevel))"
             "The polyline with a butt line cap and bevel line join"
@@ -129,7 +129,7 @@ let main argv =
     let allSetChart = Chart.addPolyline allSetCurve Empty
     let allSetChartStr = allSetChart |> toHTML
     let setAllTest =
-        "8. Overriding all properties",
+        "Overriding all properties",
         [
             "Polyline.setOptions (Polyline.Options (Name='All Set Name', Colour=Colour.Red, Thickness=1.0, LineCap=LineCap.Square, LineJoin=LineJoin.Miter) )"
             "A red polyline 1px thick with a square line cap, miter line join and a legend with its name"
@@ -145,7 +145,7 @@ let main argv =
     let setNameSetStrokeCurveChart = Chart.addPolyline setNameSetStrokeCurve Empty
     let setNameSetStrokeCurveChartStr = setNameSetStrokeCurveChart |> toHTML
     let setNameSetStrokeTest =
-        "9. Setting polyline name and stroke colour",
+        "Setting polyline name and stroke colour",
         [
             "|> Polyline.setName 'Green polyline name' |> Polyline.setStrokeColour Colour.Green"
             "A green polyline and a legend with its name"
@@ -162,7 +162,7 @@ let main argv =
     let setThicknessSetLineCapSetLineJoinCurveChart = Chart.addPolyline setThicknessSetLineCapSetLineJoinCurve Empty
     let setThicknessSetLineCapSetLineJoinCurveChartStr = setThicknessSetLineCapSetLineJoinCurveChart |> toHTML
     let setThicknessSetLineCapSetLineJoinTest =
-        "10. Setting line thickness, cap and join",
+        "Setting line thickness, cap and join",
         [
             "|> Polyline.setThickness 50.0 |> Polyline.setLineCap LineCap.Square |> Polyline.setLineJoin LineJoin.Miter"
             "A polyline 50px thick with a square line cap, miter line join"
@@ -174,7 +174,7 @@ let main argv =
     let titleCurveChart = Chart.addPolyline blue20RoundRoundCurve Empty
     let titleCurveChartStr = titleCurveChart |> Chart.setTitle "Chart title" |> toHTML
     let titleTest =
-        "11. Setting the chart name",
+        "Setting the chart name",
         [
             "|> Chart.setTitle 'Chart title'"
             "Chart has a title above it"
@@ -186,7 +186,7 @@ let main argv =
     let axisCurveChart = Chart.addPolyline blue20RoundRoundCurve Empty
     let axisCurveChartStr = axisCurveChart |> Chart.setXlabel "Horizontal axis" |> Chart.setYlabel "Vertical axis" |> toHTML
     let axisTest =
-        "12. Setting axes names",
+        "Setting axes names",
         [
             "|> Chart.setXlabel 'Horizontal axis' |> Chart.setYlabel 'Vertical axis'"
             "X and Y axes have titles"
@@ -199,7 +199,7 @@ let main argv =
     let basicPolylineChart = Chart.addPolyline basicPolylinePlot Empty
     let basicPolylineChartStr = basicPolylineChart |> toHTML
     let basicPolylineTest =
-        "13. Default polyline via createMarkers",
+        "Default polyline via createMarkers",
         [
             "createPolyline Xseries Yseries1"
             "Blue polyline 1px thick with no name specified in a legend"
@@ -215,7 +215,7 @@ let main argv =
     let basicMarkersChart = Chart.addMarkers basicMarkersPlot Empty
     let basicMarkersChartStr = basicMarkersChart |> toHTML
     let basicMarkersTest =
-        "14. Simple markers sample",
+        "Simple markers sample",
         [
             "createMarkers Xseries Yseries1"
             "Box-shaped blue markers and a legend without markers name in it"
@@ -228,7 +228,7 @@ let main argv =
     let emptyOptionsMarkersChart = Chart.addMarkers emptyOptionsMarkers Empty
     let emptyOptionsMarkersChartStr = emptyOptionsMarkersChart |> toHTML
     let emptyOptionsMarkersTest =
-        "15. Setting empty properties list",
+        "Setting empty properties list",
         [
             "Markers.setOptions(Markers.Options())"
             "Same markers as on the previous chart"
@@ -241,7 +241,7 @@ let main argv =
     let nameMarkersChart = Chart.addMarkers nameMarkersPlot Empty
     let nameMarkersChartStr = nameMarkersChart |> toHTML
     let nameMarkersTest =
-        "16. Specifying name of the markers",
+        "Specifying name of the markers",
         [
             "Markers.setOptions (Markers.Options(Name = 'Markers'))"
             "Same markers as on the previous chart with a markers name in a legend "
@@ -254,7 +254,7 @@ let main argv =
     let borderFillMarkersPlotChart = Chart.addMarkers borderFillMarkersPlot Empty
     let borderFillMarkersPlotChartStr = borderFillMarkersPlotChart |> toHTML
     let borderFillMarkersTest =
-        "17. Specifying border and fill colours of the markers",
+        "Specifying border and fill colours of the markers",
         [
             "Markers.setOptions (Markers.Options(BorderColour = Colour.Blue, FillColour = Colour.Green))"
             "Markers are green with blue borders now "
@@ -267,7 +267,7 @@ let main argv =
     let shapeMarkersPlotChart = Chart.addMarkers shapeMarkersPlot Empty
     let shapeMarkersPlotChartStr = shapeMarkersPlotChart |> toHTML
     let shapeMarkersTest =
-        "17. Specifying shape of a marker",
+        "Specifying shape of a marker",
         [
             "Markers.setOptions (Markers.Options(Shape = Shape.Cross))"
             "Markers have a cross shape"
@@ -280,7 +280,7 @@ let main argv =
     let sizeMarkersPlotChart = Chart.addMarkers sizeMarkersPlot Empty
     let sizeMarkersPlotChartStr = sizeMarkersPlotChart |> toHTML
     let sizeMarkersTest =
-        "17. Specifying size of a marker",
+        "Specifying size of a marker",
         [
             "Markers.setOptions (Markers.Options(Size = 30.0))"
             "Markers are 30px of a size"
@@ -310,8 +310,9 @@ let main argv =
             borderFillMarkersTest
             shapeMarkersTest
             sizeMarkersTest
-        ]    
+        ]
 
+    let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, chartStr) tests
 
     let generatedDiv = tests |> CollectionToHtml.toHTML 
     

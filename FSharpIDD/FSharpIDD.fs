@@ -163,15 +163,15 @@ module Plots =
         type Plot = {
             /// Specifies how to annotate markers in the legend. Null means that name is not set
             Name: string
-            /// Series of X coords of the markers
+            /// Series of X coords of markers
             X: DataSeries
-            /// Series of Y coords of the markers
+            /// Series of Y coords of markers
             Y: DataSeries
             /// Specifies the size of one marker in pixels
             Size: float
-            /// The markers fill colour
+            /// The colour with which the colour will be filled
             FillColour: Colour.Colour
-            /// The colour of the markers border
+            /// The colour of a marker border
             BorderColour: Colour.Colour
             /// The shape of a marker
             Shape: Shape
