@@ -301,7 +301,7 @@ module Chart =
     |   Visible
     /// The legend is visible if some of the plots have their name set
     |   Automatic
-    /// The legenit is not visible
+    /// The legend is not visible
     |   Hidden
 
     /// Represents single chart that can be transformed later into the HTML IDD Chart    
@@ -340,7 +340,7 @@ module Chart =
         Yaxis = Axis.Numeric
         GridLines = DefaultGridLines
         IsLegendEnabled = Automatic
-        IsNavigationEnabled = false
+        IsNavigationEnabled = true
         Plots = []
     }
 
@@ -363,9 +363,11 @@ module Chart =
     /// Set the mode of grid lines appearance
     let setGridLines gridLines chart = {chart with GridLines = gridLines}
     
-    let setLegendEnabled isEnabled chart = {chart with IsLegendEnabled = isEnabled}
+    /// Set the visibility of the plot legend floating in the top-right region of the chart
+    let setLegendEnabled legendVisibility chart = {chart with IsLegendEnabled = legendVisibility}
 
-    let setNavigationenabled isEnabled chart = {chart with IsNavigationEnabled = isEnabled}
+    /// Set whether the chart can be navigated with a mouse or touch gestures
+    let setNavigationEnabled isEnabled chart = {chart with IsNavigationEnabled = isEnabled}
 
     open Html
 
@@ -375,7 +377,22 @@ module Chart =
             |> addAttribute "class" "fsharp-idd" 
             |> addAttribute "data-idd-plot" "figure" 
             |> addAttribute "style" (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
-        
+                
+        let chartNode = 
+            if chart.Ylabel <> null then
+                let containerNode =
+                    let labelNode =
+                        createDiv()
+                        |> addAttribute "class" "idd-verticalTitle-inner"
+                        |> addText chart.Ylabel
+                    createDiv()
+                    |> addAttribute "class" "idd-verticalTitle"
+                    |> addAttribute "data-idd-placement" "left"
+                    |> addDiv labelNode                                        
+                chartNode |> addDiv containerNode
+            else
+                chartNode
+
         let chartNode,yAxisID = 
             match chart.Yaxis with
             |   Axis.Hidden -> chartNode, Option.None
@@ -388,6 +405,17 @@ module Chart =
                     |> addAttribute "data-idd-placement" "left"
                     |> addAttribute "style" "position: relative;"                    
                 (chartNode |> addDiv axisNode),(Some id)
+        
+        let chartNode = 
+            if chart.Xlabel <> null then
+                let labelNode =
+                    createDiv()
+                    |> addAttribute "class" "idd-horizontalTitle"
+                    |> addAttribute "data-idd-placement" "bottom"
+                    |> addText chart.Xlabel
+                chartNode |> addDiv labelNode
+            else
+                chartNode
 
         let chartNode,xAxisID = 
             match chart.Xaxis with
@@ -400,32 +428,7 @@ module Chart =
                     |> addAttribute "data-idd-axis" "numeric"
                     |> addAttribute "data-idd-placement" "bottom"
                     |> addAttribute "style" "position: relative;"                    
-                (chartNode |> addDiv axisNode),(Some id)
-        
-        let chartNode =
-            match chart.GridLines with
-            |   GridLines.Enabled(colour,thickness) ->                
-                let gridNode =
-                    let styleEntries = [ sprintf "thickness: %.1fpx" thickness ]
-                    let styleEntries = 
-                        match colour with
-                        | Colour.Rgb c -> (sprintf "stroke: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
-                        | Colour.Default -> styleEntries 
-                    let styleValue = System.String.Join("; ",styleEntries)
-                    createDiv()
-                    |> addAttribute "data-idd-plot" "grid"
-                    |> addAttribute "data-idd-placement" "center"
-                    |> addAttribute "data-idd-style" styleValue
-                let gridNode = 
-                    match xAxisID with
-                    |   Some xId -> gridNode |> addAttribute "data-idd-xaxis" xId
-                    |   Option.None -> gridNode
-                let gridNode = 
-                    match yAxisID with
-                    |   Some yId -> gridNode |> addAttribute "data-idd-yaxis" yId
-                    |   Option.None -> gridNode
-                chartNode |> addDiv gridNode
-            |   GridLines.Disabled -> chartNode
+                (chartNode |> addDiv axisNode),(Some id)               
         
         let effectiveLegendvisibility =
             match chart.IsLegendEnabled with
@@ -434,7 +437,8 @@ module Chart =
             |   Automatic ->
                 let isNameDefined plot =
                     match plot with
-                    |   Polyline p -> p.Name <> null                
+                    |   Polyline p -> p.Name <> null
+                    |   Markers m -> m.Name <> null
                 List.exists isNameDefined chart.Plots
 
         let chartNode = chartNode |> addAttribute "data-idd-legend-enabled" (if effectiveLegendvisibility then "true" else "false")            
@@ -451,38 +455,12 @@ module Chart =
             else
                 chartNode
 
-        let chartNode = 
-            if chart.Xlabel <> null then
-                let labelNode =
-                    createDiv()
-                    |> addAttribute "class" "idd-horizontalTitle"
-                    |> addAttribute "data-idd-placement" "bottom"
-                    |> addText chart.Xlabel
-                chartNode |> addDiv labelNode
-            else
-                chartNode
-
-        let chartNode = 
-            if chart.Ylabel <> null then
-                let containerNode =
-                    let labelNode =
-                        createDiv()
-                        |> addAttribute "class" "idd-verticalTitle-inner"
-                        |> addText chart.Ylabel
-                    createDiv()
-                    |> addAttribute "class" "idd-verticalTitle"
-                    |> addAttribute "data-idd-placement" "left"
-                    |> addDiv labelNode                                        
-                chartNode |> addDiv containerNode
-            else
-                chartNode
-
-        let polylineToDiv (p:Polyline.Plot) =
-            let getDataDom xSeries ySeries =
+        let getDataDom xSeries ySeries =
                 // can't use string builder here as it is not transpilable with WebSharper
                 let str = Seq.fold2 (fun state x y -> state + (sprintf "\t%f\t%f\n" x y)) "\tx\ty\n" xSeries ySeries                                
                 str
-                        
+
+        let polylineToDiv (p:Polyline.Plot) =                                    
             let styleEntries = [ sprintf "thickness: %.1f" p.Thickness ]
             let styleEntries = 
                 match p.Colour with
@@ -518,12 +496,7 @@ module Chart =
 
             resultNode
 
-        let markersToDiv (m: Markers.Plot) =
-            let getDataDom xSeries ySeries =
-                // can't use string builder here as it is not transpilable with WebSharper
-                let str = Seq.fold2 (fun state x y -> state + (sprintf "\t%f\t%f\n" x y)) "\tx\ty\n" xSeries ySeries                                
-                str
-                    
+        let markersToDiv (m: Markers.Plot) =                                
             // A number is a size in pixels
             let styleEntries = [ sprintf "size: %.1f" m.Size ]
 
@@ -571,6 +544,31 @@ module Chart =
         let plotElems = chart.Plots |> Seq.map plotToDiv
         let chartNode = Seq.fold (fun state elem -> addDiv elem state) chartNode plotElems
         
+        let chartNode =
+            match chart.GridLines with
+            |   GridLines.Enabled(colour,thickness) ->                
+                let gridNode =
+                    let styleEntries = [ sprintf "thickness: %.1fpx" thickness ]
+                    let styleEntries = 
+                        match colour with
+                        | Colour.Rgb c -> (sprintf "stroke: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
+                        | Colour.Default -> styleEntries 
+                    let styleValue = System.String.Join("; ",styleEntries)
+                    createDiv()
+                    |> addAttribute "data-idd-plot" "grid"
+                    |> addAttribute "data-idd-placement" "center"
+                    |> addAttribute "data-idd-style" styleValue
+                let gridNode = 
+                    match xAxisID with
+                    |   Some xId -> gridNode |> addAttribute "data-idd-xaxis" xId
+                    |   Option.None -> gridNode
+                let gridNode = 
+                    match yAxisID with
+                    |   Some yId -> gridNode |> addAttribute "data-idd-yaxis" yId
+                    |   Option.None -> gridNode
+                chartNode |> addDiv gridNode
+            |   GridLines.Disabled -> chartNode
+
         divToStr chartNode
 
     

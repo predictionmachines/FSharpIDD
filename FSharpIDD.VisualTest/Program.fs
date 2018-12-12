@@ -16,14 +16,10 @@ let main argv =
     let Xseries = Array.init 3 (fun i -> float(i+1))
     let Yseries1 = Xseries |> Array.map (fun x -> sin(2.0*x)/x)
 
-    let Empty : Chart = {
-        Width = 400
-        Height = 300
-        Title = null
-        Xlabel = null
-        Ylabel = null
-        Plots = []
-    }
+    let Empty : Chart =
+        Chart.Empty
+        |> Chart.setSize 400 300
+        |> Chart.setNavigationEnabled false
     
     let blue20RoundRoundCurve : Polyline.Plot =
         {
