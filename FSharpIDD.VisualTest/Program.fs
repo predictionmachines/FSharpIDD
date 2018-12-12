@@ -62,6 +62,18 @@ let main argv =
         navigationEnabledChartStr
 
 
+    // Hidden Y axis
+    let HiddenYAxisChart = Chart.addPolyline blue20RoundRoundCurve Empty
+    let HiddenYAxisChartStr = HiddenYAxisChart |> Chart.setYaxis Axis.Hidden |> toHTML
+    let HiddenYAxisTest =
+        "Hidden Y axis",
+        [
+            "|> Chart.setYaxis Axis.Hidden"
+            "Polyline plot with X axis only"
+        ],
+        HiddenYAxisChartStr
+
+
     let tests = 
         [
             emptyChartTest
@@ -86,6 +98,7 @@ let main argv =
             legendEnabledTest
             legendDisabledTest
             navigationEnabledTest
+            HiddenYAxisTest
         ]
 
     let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, chartStr) tests
