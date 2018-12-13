@@ -74,6 +74,30 @@ let main argv =
         HiddenYAxisChartStr
 
 
+    // Grid lines disabled
+    let gridDisabledLinesChart = Chart.addMarkers basicMarkersPlot Empty
+    let gridDisabledLinesChartStr = gridDisabledLinesChart |> Chart.setGridLines GridLines.Disabled |> toHTML
+    let gridDisabledLinesTest =
+        "Hiding grid lines",
+        [
+            "|> Chart.setGridLines GridLines.Disabled"
+            "Markers plot without grid lines"
+        ],
+        gridDisabledLinesChartStr
+
+
+    // Styling grid lines
+    let gridStyledLinesChart = Chart.addPolyline blue20RoundRoundCurve Empty
+    let gridStyledLinesChartStr = gridStyledLinesChart |> Chart.setGridLines (GridLines.Enabled(Colour.Green, 2.0)) |> toHTML
+    let gridStyledLinesTest =
+        "Styling grid lines",
+        [
+            "|> Chart.setGridLines (GridLines.Enabled(Colour.Green, 2.0))"
+            "Polyline plot with green thin grid lines"
+        ],
+        gridStyledLinesChartStr
+
+
     let tests = 
         [
             emptyChartTest
@@ -99,6 +123,8 @@ let main argv =
             legendDisabledTest
             navigationEnabledTest
             HiddenYAxisTest
+            gridDisabledLinesTest
+            gridStyledLinesTest
         ]
 
     let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, chartStr) tests
