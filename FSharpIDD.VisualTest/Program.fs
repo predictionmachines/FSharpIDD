@@ -96,7 +96,27 @@ let main argv =
             "Polyline plot with green thin grid lines"
         ],
         gridStyledLinesChartStr
+    
+    // Removing data visual padding    
+    let paddingRemovedChart = Chart.addPolyline {blue20RoundRoundCurve with Thickness = 1.0} Empty
+    let paddingRemovedChartStr = paddingRemovedChart |> Chart.setVisibleRegion (Autofit 0) |> toHTML
+    let paddingRemovedTest =
+        "Visible padding removed",
+        [
+            "|> Chart.setVisibleRegion (Autofit 0)"
+            "The polyline bounds touch the chart bounds"
+        ],
+        paddingRemovedChartStr
 
+    // Explicit visual region    
+    let explicitVisualRegionStr = Chart.addPolyline blue20RoundRoundCurve Empty |> Chart.setVisibleRegion (Explicit(-1.0,-1.0,15.0,5.0)) |> toHTML
+    let explicitVisualRegionTest =
+        "Visible region explicitly set",
+        [
+            "Chart.setVisibleRegion (Explicit(-1.0,-1.0,15.0,5.0))"
+            "Polyline is in lower-left part of the visible region"
+        ],
+        explicitVisualRegionStr
 
     let tests = 
         [
@@ -125,6 +145,8 @@ let main argv =
             HiddenYAxisTest
             gridDisabledLinesTest
             gridStyledLinesTest
+            paddingRemovedTest
+            explicitVisualRegionTest
         ]
 
     let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, chartStr) tests

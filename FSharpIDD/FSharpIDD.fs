@@ -13,26 +13,6 @@ module Utils =
         System.Guid.NewGuid().ToString()
 
 
-/// This module is to reduce the dependencies count and to ease possible WebSharper compilation
-[<JavaScript>]
-module Colour =    
-    type RgbColour = {
-        R: byte
-        G: byte
-        B: byte
-    }
-
-    type Colour = 
-    | Default
-    | Rgb of RgbColour
-
-    let createColour red green blue = Rgb {R=red; G=green;B=blue}
-
-    let Red = createColour (byte 255) (byte 0) (byte 0)
-    let Green = createColour (byte 0) (byte 255) (byte 0)
-    let Blue = createColour (byte 0) (byte 0) (byte 255)
-    let DarkGrey = createColour (byte 0xA9) (byte 0xA9) (byte 0xA9)
-
 [<JavaScript>]
 module Plots =    
     type DataSeries = float seq
@@ -391,8 +371,7 @@ module Plots =
 
 [<JavaScript>]
 module Chart =        
-    open Plots    
-    open System
+    open Plots
 
     type Axis = 
     /// The axis is disabled (not visible)
@@ -413,6 +392,12 @@ module Chart =
     |   Automatic
     /// The legend is not visible
     |   Hidden
+
+    type VisibleRegion =
+    /// Fits the visible region so that all of the data is visible adding additional padding (blank visible area) in pixels
+    |   Autofit of dataPaddingPx:int
+    /// Explicit visible region in data coordinates
+    |   Explicit of xmin:float * ymin:float * xmax:float * ymax:float
 
     /// Represents single chart that can be transformed later into the HTML IDD Chart    
     type Chart = {
@@ -438,6 +423,8 @@ module Chart =
         IsLegendEnabled: LegendVisibility
         /// Whether the chart visible area can be navigated with a mouse or touch gestures
         IsNavigationEnabled: bool
+        /// Which visible rectangle is displayed by the chart
+        VisibleRegion : VisibleRegion
     }
 
     let Empty : Chart = {
@@ -452,6 +439,7 @@ module Chart =
         IsLegendEnabled = Automatic
         IsNavigationEnabled = true
         Plots = []
+        VisibleRegion = VisibleRegion.Autofit 20
     }
 
     let addPolyline polyline chart = { chart with Plots = Polyline(polyline)::chart.Plots }
@@ -472,6 +460,9 @@ module Chart =
     /// Sets the mode of X axis
     let setXaxis axisMode chart = {chart with Xaxis = axisMode}
 
+    /// Sets the visible region that is displayed by the chart
+    let setVisibleRegion region chart = { chart with VisibleRegion = region}
+
     /// Set the Y axis textual label (placed to the left of Y axis)
     let setYlabel label chart = { chart with Ylabel = label}
 
@@ -491,10 +482,15 @@ module Chart =
 
     let toHTML (chart:Chart) =
         let chartNode =
+            let addVisibleRegionAttribute = 
+                match chart.VisibleRegion with
+                |   Autofit padding -> addAttribute "data-idd-padding" (sprintf "%d" padding)
+                |   Explicit(xmin,ymin,xmax,ymax) -> addAttribute "data-idd-visible-region" (sprintf "%f %f %f %f" xmin xmax ymin ymax)
             createDiv()
             |> addAttribute "class" "fsharp-idd" 
             |> addAttribute "data-idd-plot" "figure" 
             |> addAttribute "style" (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
+            |> addVisibleRegionAttribute
                 
         let chartNode = 
             if chart.Ylabel <> null then
