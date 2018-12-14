@@ -168,7 +168,7 @@ module Plots =
 
         /// The single marker plot settings
         type Plot = {
-            /// Specifies how to annotate markers in the legend. Null means that name is not set
+            /// Specifies how to annotate markers in a legend. Null means that name is not set
             Name: string
             /// Series of X coords of markers
             X: DataSeries
@@ -273,9 +273,54 @@ module Plots =
                     Size = size
             }
 
+    module BarChart =
+        /// BarChart plot settings
+        type Plot = {
+            /// Specifies how to annotate BarChart plot in a legend
+            Name: string
+            /// Series of X coordinates of bar centers in a bar chart plot
+            X: DataSeries
+            /// Series of bar heights. Length of the series equals the number of bars
+            Y: DataSeries
+            /// The width in plot coordinates of one bar in a bar chart plot
+            BarWidth: float
+            /// The colour with which a bar will be filled
+            FillColour: Colour.Colour
+            /// The colour of a bar border
+            BorderColour: Colour.Colour
+            /// The colour of a bar shadow
+            Shadow: Colour.Colour
+        }
+        
+        type Options() =
+            let mutable name: string option = None
+            let mutable fillcolour: Colour.Colour option = None
+            let mutable bordercolour: Colour.Colour option = None
+            let mutable shadow: Colour.Colour option = None
+            let mutable barwidth: float option = None
+
+            member s.Name with set v = name <- Some(v)                
+            member s.SpecifiedName with internal get() = name
+            member s.FillColour with set v = fillcolour <- Some(v)
+            member s.SpecifiedFillColour with internal get() = fillcolour
+            member s.BorderColour with set v = bordercolour <- Some(v)
+            member s.SpecifiedBorderColour with internal get() = bordercolour
+            member s.Shadow with set v = shadow <- Some(v)
+            member s.SpecifiedShadow with internal get() = shadow
+            member s.BarWidth with set v = barwidth <- Some(v)
+            member s.SpecifiedBarWidth with internal get() = barwidth
+        
+        /// Changes the name of bar chart plot (how it is depicted in the legend)
+        let setName name barChart =
+            {
+                barChart with
+                    Name = name
+            }
+
     type Plot =
     |   Polyline of Polyline.Plot
     |   Markers of Markers.Plot
+    |   BarChart of BarChart.Plot
 
     type SizeType = int
 
@@ -327,7 +372,7 @@ module Chart =
         Yaxis: Axis
         /// The appearance of grid lines
         GridLines : GridLines
-        /// A collection of plots (polyline, markers, etc) to draw
+        /// A collection of plots (polyline, markers, bar charts, etc) to draw
         Plots: Plot list
         /// Whether the legend (list of plot names and their icons) is visible in the top-right part of the chart
         IsLegendEnabled: LegendVisibility
@@ -355,6 +400,8 @@ module Chart =
     let addPolyline polyline chart = { chart with Plots = Polyline(polyline)::chart.Plots }
 
     let addMarkers markers chart = { chart with Plots = Markers(markers)::chart.Plots }
+
+    let addBarChart barchart chart = { chart with Plots = BarChart(barchart)::chart.Plots }
 
     /// Sets the textual title that will be placed above the charting area
     let setTitle title chart =  { chart with Title = title}
@@ -461,6 +508,7 @@ module Chart =
                     match plot with
                     |   Polyline p -> p.Name <> null
                     |   Markers m -> m.Name <> null
+                    |   BarChart b -> b.Name <> null
                 List.exists isNameDefined chart.Plots
 
         let chartNode = chartNode |> addAttribute "data-idd-legend-enabled" (if effectiveLegendvisibility then "true" else "false")            
@@ -557,11 +605,49 @@ module Chart =
                     resultNode |> addAttribute "data-idd-name" m.Name  
 
             resultNode
+
+        let barchartToDiv (b: BarChart.Plot) =                                
+            // A number is a size in pixels
+            let styleEntries = [ sprintf "barWidth: %.1f" b.BarWidth ]
+
+            let styleEntries = 
+                match b.FillColour with
+                | Colour.Rgb c -> (sprintf "color: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
+                | Colour.Default -> styleEntries
+
+            let styleEntries = 
+                match b.BorderColour with
+                | Colour.Rgb c -> (sprintf "border: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
+                | Colour.Default -> styleEntries
+
+            let styleEntries = 
+                match b.Shadow with
+                | Colour.Rgb c -> (sprintf "shadow: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
+                | Colour.Default -> styleEntries
+                
+            let styleEntries = (sprintf "shape: bars")::styleEntries
+
+            let styleValue = System.String.Join("; ",styleEntries)
+
+            let resultNode =
+                createDiv()
+                |> addAttribute "data-idd-plot" "markers"
+                |> addAttribute "data-idd-style" styleValue
+                |> addText (getDataDom b.X b.Y)
+                        
+            let resultNode =
+                if System.String.IsNullOrEmpty b.Name then
+                    resultNode
+                else
+                    resultNode |> addAttribute "data-idd-name" b.Name  
+
+            resultNode
     
         let plotToDiv plot =
             match plot with
             |   Polyline p -> polylineToDiv p
             |   Markers m -> markersToDiv m
+            |   BarChart b -> barchartToDiv b
 
         let plotElems = chart.Plots |> Seq.map plotToDiv
         let chartNode = Seq.fold (fun state elem -> addDiv elem state) chartNode plotElems
