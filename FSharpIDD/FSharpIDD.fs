@@ -245,7 +245,7 @@ module Plots =
                     Name = name
             }
         
-        /// Changes the colour of a marker's border (how are they depicted in the legend)
+        /// Changes the colour of a marker's border
         let setBorderColour bordercolour markers =
             {
                 markers with
@@ -309,6 +309,71 @@ module Plots =
             member s.SpecifiedShadow with internal get() = shadow
             member s.BarWidth with set v = barwidth <- Some(v)
             member s.SpecifiedBarWidth with internal get() = barwidth
+    
+        /// sets several bar chart options at once
+        let setOptions (options:Options) barchart =
+            let barchart =
+                match options.SpecifiedName with
+                | None -> barchart
+                | Some(name) -> {barchart with Name = name}
+            let barchart =
+                match options.SpecifiedFillColour with
+                | None -> barchart
+                | Some(fillcolour) -> {barchart with FillColour = fillcolour}
+            let barchart =
+                match options.SpecifiedBorderColour with
+                | None -> barchart
+                | Some(bordercolour) -> {barchart with BorderColour = bordercolour}
+            let barchart =
+                match options.SpecifiedBarWidth with
+                | None -> barchart
+                | Some(barwidth) -> {barchart with BarWidth = barwidth}
+            let barchart =
+                match options.SpecifiedShadow with
+                | None -> barchart
+                | Some(shadow) -> {barchart with Shadow = shadow}
+            barchart
+        
+        /// Creates bar chart plot using the specified set of X and Y coords with default settings
+        let createBarChart x y = 
+                {
+                    X = x
+                    Y = y
+                    Name = null
+                    FillColour = Colour.Default
+                    BorderColour = Colour.Default
+                    Shadow = Colour.Default
+                    BarWidth = 1.0
+                }
+        
+        /// Changes a colour of bar's borders
+        let setBorderColour bordercolour barchart =
+            {
+                barchart with
+                    BorderColour = bordercolour
+            }
+        
+        /// Changes a colour with which a bar is filled (how are they depicted in the legend)
+        let setFillColour fillcolour barchart =
+            {
+                barchart with
+                    FillColour = fillcolour
+            }
+
+        /// Sets color of a shadow of a bar
+        let setShadow shadow barchart =
+            {
+                barchart with
+                    Shadow = shadow
+            }
+
+        /// Sets bar width (in plot coords) of a bar
+        let setBarWidth barwidth barchart =
+            {
+                barchart with
+                    BarWidth = barwidth
+            }
+        
         
         /// Changes the name of bar chart plot (how it is depicted in the legend)
         let setName name barChart =
@@ -591,7 +656,7 @@ module Chart =
             resultNode
 
         let barchartToDiv (b: BarChart.Plot) =                                
-            // A number is a size in pixels
+            // A number is a size in plot coords
             let styleEntries = [ sprintf "barWidth: %.1f" b.BarWidth ]
 
             let styleEntries = 
