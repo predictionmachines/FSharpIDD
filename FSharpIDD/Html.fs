@@ -28,6 +28,15 @@ module Html=
             raise(System.ArgumentException(sprintf "the string must contain only letters, digits or %A, but %s was passed" validChars str))
         Valid str
 
+    let internal guardAttrValue (str:string): HtmlString =
+        // https://html.spec.whatwg.org/multipage/syntax.html#syntax-attribute-value
+        // first escaping escape
+        let str = str.Replace("\\","\\\\")
+        // then escaping double quotes
+        let str = str.Replace("\"","\\\"")
+        Valid str
+
+
     let internal guardText (str:string) : HtmlString = 
         let validChars = [|'-';'['; ']'; '('; ')';':'; ';'; '.'; ','; '%'; '_'|]
         if str.ToCharArray() |> Array.exists (fun c -> not(System.Char.IsWhiteSpace(c) || System.Char.IsLetterOrDigit(c) || (Array.contains c validChars)) ) then
@@ -58,7 +67,7 @@ module Html=
     let addAttribute key value div =    
         {
             div with
-                Attributes = {Key = guardAttrName key; Value = guardText value} :: div.Attributes
+                Attributes = {Key = guardAttrName key; Value = guardAttrValue value} :: div.Attributes
         }
 
     let rec divToStr div =

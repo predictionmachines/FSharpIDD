@@ -20,6 +20,7 @@
   </PropertyGroup>-->
   <ItemGroup>
     <Compile Include="WebSharperStub.fs" />
+    <Compile Include="Colour.fs" />
     <Compile Include="Html.fs" />
     <Compile Include="Histogram.fs" />
     <Compile Include="FSharpIDD.fs" />

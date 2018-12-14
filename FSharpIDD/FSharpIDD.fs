@@ -13,26 +13,6 @@ module Utils =
         System.Guid.NewGuid().ToString()
 
 
-/// This module is to reduce the dependencies count and to ease possible WebSharper compilation
-[<JavaScript>]
-module Colour =    
-    type RgbColour = {
-        R: byte
-        G: byte
-        B: byte
-    }
-
-    type Colour = 
-    | Default
-    | Rgb of RgbColour
-
-    let createColour red green blue = Rgb {R=red; G=green;B=blue}
-
-    let Red = createColour (byte 255) (byte 0) (byte 0)
-    let Green = createColour (byte 0) (byte 255) (byte 0)
-    let Blue = createColour (byte 0) (byte 0) (byte 255)
-    let DarkGrey = createColour (byte 0xA9) (byte 0xA9) (byte 0xA9)
-
 [<JavaScript>]
 module Plots =    
     type DataSeries = float seq
