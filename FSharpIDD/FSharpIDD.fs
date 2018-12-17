@@ -254,29 +254,33 @@ module Plots =
             }
 
     module BarChart =
+        type Shadow =
+        |   WithoutShadow
+        |   WithShadow of Colour.Colour
+
         /// BarChart plot settings
         type Plot = {
             /// Specifies how to annotate BarChart plot in a legend
             Name: string
-            /// Series of X coordinates of bar centers in a bar chart plot
-            X: DataSeries
+            /// Series of bar centers horizontal coordinates. Length of the series equals the number of bars
+            BarCenters: DataSeries
             /// Series of bar heights. Length of the series equals the number of bars
-            Y: DataSeries
+            BarHeights: DataSeries
             /// The width in plot coordinates of one bar in a bar chart plot
             BarWidth: float
             /// The colour with which a bar will be filled
             FillColour: Colour.Colour
             /// The colour of a bar border
             BorderColour: Colour.Colour
-            /// The colour of a bar shadow
-            Shadow: Colour.Colour
+            /// The colour of a bar shadowcolour
+            Shadow: Shadow
         }
         
         type Options() =
             let mutable name: string option = None
             let mutable fillcolour: Colour.Colour option = None
             let mutable bordercolour: Colour.Colour option = None
-            let mutable shadow: Colour.Colour option = None
+            let mutable shadow: Shadow option = None
             let mutable barwidth: float option = None
 
             member s.Name with set v = name <- Some(v)                
@@ -314,15 +318,15 @@ module Plots =
                 | Some(shadow) -> {barchart with Shadow = shadow}
             barchart
         
-        /// Creates bar chart plot using the specified set of X and Y coords with default settings
-        let createBarChart x y = 
+        /// Creates bar chart plot using the specified set of BarCenters and BarHeights with default settings
+        let createBarChart barcenters barheights = 
                 {
-                    X = x
-                    Y = y
+                    BarCenters = barcenters
+                    BarHeights = barheights
                     Name = null
                     FillColour = Colour.Default
                     BorderColour = Colour.Default
-                    Shadow = Colour.Default
+                    Shadow = Shadow.WithoutShadow
                     BarWidth = 1.0
                 }
         
@@ -667,8 +671,11 @@ module Chart =
 
             let styleEntries = 
                 match b.Shadow with
-                | Colour.Rgb c -> (sprintf "shadow: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
-                | Colour.Default -> styleEntries
+                | BarChart.Shadow.WithShadow c ->
+                    match c with
+                    |   Colour.Rgb c -> (sprintf "shadow: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
+                    |   Colour.Default -> "shadow: grey"::styleEntries
+                | BarChart.Shadow.WithoutShadow -> styleEntries
                 
             let styleEntries = (sprintf "shape: bars")::styleEntries
 
@@ -678,7 +685,7 @@ module Chart =
                 createDiv()
                 |> addAttribute "data-idd-plot" "markers"
                 |> addAttribute "data-idd-style" styleValue
-                |> addText (getDataDom b.X b.Y)
+                |> addText (getDataDom b.BarCenters b.BarHeights)
                         
             let resultNode =
                 if System.String.IsNullOrEmpty b.Name then
@@ -706,7 +713,7 @@ module Chart =
                         match colour with
                         | Colour.Rgb c -> (sprintf "stroke: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
                         | Colour.Default -> styleEntries 
-                    let styleValue = System.String.Join("; ",styleEntries)
+                    let styleValue = System.String.Join<string>("; ",styleEntries)
                     createDiv()
                     |> addAttribute "data-idd-plot" "grid"
                     |> addAttribute "data-idd-placement" "center"
