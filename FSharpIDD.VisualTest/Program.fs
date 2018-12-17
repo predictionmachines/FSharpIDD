@@ -11,6 +11,7 @@ open FSharpIDD.Colour
 open PolylineTests
 open MarkersTests
 open BarChartTest
+open HistogramTests
 
 [<EntryPoint>]
 let main argv =
@@ -161,6 +162,11 @@ let main argv =
             defaultShadowBarChartTest
             withoutShadowBarChartTest
             barWidthBarChartTest
+            //histogram
+            basicHistogramChartTest
+            histogramSetBinsTest
+            histogramSetColourTest
+            histogramSetNameTest
         ]
 
     let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, (chartStr |> toHTML)) tests

@@ -57,7 +57,8 @@
     <Content Include="packages.config" />
     <Compile Include="PolylineTests.fs" />
     <Compile Include="MarkersTests.fs" />
-    <Compile Include="BarChart.fs" />
+    <Compile Include="BarsTests.fs" />
+    <Compile Include="HistogramTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
