@@ -386,12 +386,40 @@ module Plots =
                 Samples = samples
                 Colour = Colour.Default
                 BinCount = 30
-            }
-        
+            }       
+
         let setName name hist = {hist with Name = name}
         let setColour colour hist = {hist with Colour = colour}
         let setBinCount count hist = {hist with BinCount = count}
         
+        type Options() =
+            let mutable name: string option = None
+            let mutable colour: Colour.Colour option = None
+            let mutable binCount: int option = None
+
+            member s.Name with set v = name <- Some(v)                
+            member s.SpecifiedName with internal get() = name
+            member s.Colour with set v = colour <- Some(v)
+            member s.SpecifiedColour with internal get() = colour
+            member s.BinCount with set v = binCount <- Some(v)
+            member s.SpecifiedBinCount with internal get() = binCount
+    
+        /// sets several histogram options at once
+        let setOptions (options:Options) histogram =
+            let histogram =
+                match options.SpecifiedName with
+                | None -> histogram
+                | Some(name) -> {histogram with Name = name}
+            let histogram =
+                match options.SpecifiedColour with
+                | None -> histogram
+                | Some(colour) -> {histogram with Colour = colour}
+            let histogram =
+                match options.SpecifiedBinCount with
+                | None -> histogram
+                | Some(binCount) -> {histogram with BinCount = binCount}
+            histogram
+
     type Plot =
     |   Polyline of Polyline.Plot
     |   Markers of Markers.Plot

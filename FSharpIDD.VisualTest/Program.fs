@@ -164,9 +164,11 @@ let main argv =
             barWidthBarChartTest
             //histogram
             basicHistogramChartTest
+            histogramSetEmptyOptionsTest
             histogramSetBinsTest
             histogramSetColourTest
             histogramSetNameTest
+            histogramSetOptionsTest
         ]
 
     let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, (chartStr |> toHTML)) tests

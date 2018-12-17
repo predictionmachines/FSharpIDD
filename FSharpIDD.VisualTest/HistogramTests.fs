@@ -25,6 +25,14 @@ let basicHistogramChartTest =
     ],
     basicHistogramChart
 
+let histogramSetEmptyOptionsTest =
+    "set empty options",
+    [
+        "setOptions(Options())"
+        "The same as previous"
+    ],
+    Empty |> Chart.addHistogram  (basicHistogram |> Histogram.setOptions (Options()))
+
 let histogramSetBinsTest =
     "Bin count set to 10",
     [
@@ -50,13 +58,10 @@ let histogramSetNameTest =
     Empty |> Chart.addHistogram  (basicHistogram |> Histogram.setName "Histo")
     
 
-// Specifying empty set of bar chart options with setOptions call
-//let emptyOptionshistogram = Histogram.setOptions(Bars.Options()) basichistogramChart
-//let emptyOptionsBarsChart = Chart.addBars emptyOptionsBarChart Empty
-//let emptyOptionsBarChartTest =
-//    "Setting empty properties list",
-//    [
-//        "BarChart.setOptions(Bars.Options())"
-//        "Same bar chart as on the previous chart"
-//    ],
-//    emptyOptionsBarsChart
+let histogramSetOptionsTest =
+    "set several options",
+    [
+        "Histogram.setOptions (Options(Name=\"options test\", BinCount=5, Colour=Colour.DarkGray))"
+        ""
+    ],
+    Empty |> Chart.addHistogram  (basicHistogram |> Histogram.setOptions (Options(Name="options test", BinCount=5, Colour=Colour.DarkGray)))
