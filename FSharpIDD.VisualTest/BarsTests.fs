@@ -1,4 +1,4 @@
-﻿module BarChartTest
+﻿module BarsTest
 
 open FSharpIDD.Plots
 open FSharpIDD.Chart
@@ -15,98 +15,98 @@ let Empty : Chart =
     
 
 // Basic bar chart sample
-let basicBarChartPlot : Bars.Plot = createBars Xseries Yseries
+let basicBarsPlot : Bars.Plot = createBars Xseries Yseries
 
 // Basic bar chart test
-let basicBarsChart = Chart.addBars basicBarChartPlot Empty
-let basicBarChartTest =
+let basicBarsChart = Chart.addBars basicBarsPlot Empty
+let basicBarsTest =
     "Simple bar chart sample",
     [
-        "createBarChart Xseries Yseries"
+        "createBars Xseries Yseries"
         "Blue bar charts"
     ],
     basicBarsChart
     
 
 // Specifying empty set of bar chart options with setOptions call
-let emptyOptionsBarChart = Bars.setOptions(Bars.Options()) basicBarChartPlot
-let emptyOptionsBarsChart = Chart.addBars emptyOptionsBarChart Empty
-let emptyOptionsBarChartTest =
+let emptyOptionsBars = Bars.setOptions(Bars.Options()) basicBarsPlot
+let emptyOptionsBarsChart = Chart.addBars emptyOptionsBars Empty
+let emptyOptionsBarsTest =
     "Setting empty properties list",
     [
-        "BarChart.setOptions(Bars.Options())"
+        "Bars.setOptions(Bars.Options())"
         "Same bar chart as on the previous chart"
     ],
     emptyOptionsBarsChart
     
 
 // Specifying bar chart name with setOptions call
-let nameBarChartPlot = Bars.setOptions (Bars.Options(Name = "BarChart")) basicBarChartPlot
-let nameBarsChart = Chart.addBars nameBarChartPlot Empty
-let nameBarChartTest =
+let nameBarsPlot = Bars.setOptions (Bars.Options(Name = "Bars")) basicBarsPlot
+let nameBarsChart = Chart.addBars nameBarsPlot Empty
+let nameBarsTest =
     "Specifying name of the bar chart",
     [
-        "BarChart.setOptions (Bars.Options(Name = 'BarChart'))"
+        "Bars.setOptions (Bars.Options(Name = 'Bars'))"
         "Same bar chart as on the previous chart with a legend "
     ],
     nameBarsChart
     
 
 // Specifying borders and fill colours of the bar chart with setOptions call
-let borderFillBarChartPlot = Bars.setOptions (Bars.Options(BorderColour = Colour.Red, FillColour = Colour.Gray)) basicBarChartPlot
-let borderFillBarChartPlotChart = Chart.addBars borderFillBarChartPlot Empty
-let borderFillBarChartTest =
+let borderFillBarsPlot = Bars.setOptions (Bars.Options(BorderColour = Colour.Red, FillColour = Colour.Gray)) basicBarsPlot
+let borderFillBarsPlotChart = Chart.addBars borderFillBarsPlot Empty
+let borderFillBarsTest =
     "Specifying borders and fill colours of the bar chart",
     [
-        "BarChart.setOptions (Bars.Options(BorderColour = Colour.Red, FillColour = Colour.Gray))"
-        "BarChart are green with blue borders now "
+        "Bars.setOptions (Bars.Options(BorderColour = Colour.Red, FillColour = Colour.Gray))"
+        "Gray bars with red borders"
     ],
-    borderFillBarChartPlotChart
+    borderFillBarsPlotChart
     
 
 // Specifying shadow colour of a bar with setOptions call
-let shadowBarChartPlot = Bars.setOptions (Bars.Options(Shadow = Shadow.WithShadow Colour.Turquoise)) basicBarChartPlot
-let shadowBarChartPlotChart = Chart.addBars shadowBarChartPlot Empty
-let shadowBarChartTest =
+let shadowBarsPlot = Bars.setOptions (Bars.Options(Shadow = Shadow.WithShadow Colour.Turquoise)) basicBarsPlot
+let shadowBarsPlotChart = Chart.addBars shadowBarsPlot Empty
+let shadowBarsTest =
     "Specifying shadow color of a bar",
     [
-        "BarChart.setOptions (Bars.Options(Shadow = Shadow.WithShadow Colour.Turquoise))"
-        "Bars have a green shadow"
+        "Bars.setOptions (Bars.Options(Shadow = Shadow.WithShadow Colour.Turquoise))"
+        "Bars have turquoise shadows"
     ],
-    shadowBarChartPlotChart
+    shadowBarsPlotChart
     
 
 // Bars with default shadow color. Setting with setOptions call
-let defaultShadowBarChartPlot = Bars.setOptions (Bars.Options(Shadow = Shadow.WithShadow Colour.Default)) basicBarChartPlot
-let defaultShadowBarChartPlotChart = Chart.addBars defaultShadowBarChartPlot Empty
-let defaultShadowBarChartTest =
+let defaultShadowBarsPlot = Bars.setOptions (Bars.Options(Shadow = Shadow.WithShadow Colour.Default)) basicBarsPlot
+let defaultShadowBarsPlotChart = Chart.addBars defaultShadowBarsPlot Empty
+let defaultShadowBarsTest =
     "Default shadow colour of bars",
     [
-        "BarChart.setOptions (Bars.Options(Shadow = Shadow.WithShadow Colour.Default))"
+        "Bars.setOptions (Bars.Options(Shadow = Shadow.WithShadow Colour.Default))"
         "Bars have a grey shadow"
     ],
-    defaultShadowBarChartPlotChart
+    defaultShadowBarsPlotChart
     
 
 // Specifying shadow colour of a bar with setOptions call
-let withoutShadowBarChartPlot = Bars.setOptions (Bars.Options(Shadow = Shadow.WithoutShadow)) basicBarChartPlot
-let withoutShadowBarChartPlotChart = Chart.addBars withoutShadowBarChartPlot Empty
-let withoutShadowBarChartTest =
+let withoutShadowBarsPlot = Bars.setOptions (Bars.Options(Shadow = Shadow.WithoutShadow)) basicBarsPlot
+let withoutShadowBarsPlotChart = Chart.addBars withoutShadowBarsPlot Empty
+let withoutShadowBarsTest =
     "Bar chart without shadow",
     [
-        "BarChart.setOptions (BarChart.Options(Shadow = Shadow.WithoutShadow))"
+        "Bars.setOptions (Bars.Options(Shadow = Shadow.WithoutShadow))"
         "Bars without shadow"
     ],
-    withoutShadowBarChartPlotChart
+    withoutShadowBarsPlotChart
     
 
 // Specifying width of a bar with setOptions call
-let barWidthBarChartPlot = Bars.setOptions (Bars.Options(BarWidth = 0.3)) basicBarChartPlot
-let barWidthBarChartPlotChart = Chart.addBars barWidthBarChartPlot Empty
-let barWidthBarChartTest =
+let barWidthBarsPlot = Bars.setOptions (Bars.Options(BarWidth = 0.3)) basicBarsPlot
+let barWidthBarsPlotChart = Chart.addBars barWidthBarsPlot Empty
+let barWidthBarsTest =
     "Specifying width of a bar",
     [
-        "BarChart.setOptions (BarChart.Options(BarWidth = 0.3))"
+        "Bars.setOptions (Bars.Options(BarWidth = 0.3))"
         "Bars are 0.3 (in plot coordinates) wide"
     ],
-    barWidthBarChartPlotChart
+    barWidthBarsPlotChart
