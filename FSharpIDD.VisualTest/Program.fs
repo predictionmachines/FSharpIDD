@@ -10,7 +10,7 @@ open FSharpIDD.Plots.Bars
 open FSharpIDD.Colour
 open PolylineTests
 open MarkersTests
-open BarChartTest
+open BarsTest
 open HistogramTests
 
 [<EntryPoint>]
@@ -31,12 +31,14 @@ let main argv =
 
 
     // Legend enabling
-    let legendEnabledChartStr = Empty |> Chart.setLegendEnabled LegendVisibility.Visible
+    let basicPolylinePlot : Polyline.Plot = createPolyline Xseries Yseries
+    let basicPolylineChart = Chart.addPolyline basicPolylinePlot Empty
+    let legendEnabledChartStr = basicPolylineChart |> Chart.setLegendEnabled LegendVisibility.Visible
     let legendEnabledTest =
         "Legend enabling",
         [
             "|> Chart.setLegendEnabled LegendVisibility.Visible"
-            "Empty chart with an empty legend"
+            "Polyline (no name) with its legend"
         ],
         legendEnabledChartStr
 
@@ -45,9 +47,9 @@ let main argv =
     let legendDisabledChart = Chart.addPolyline blue20RoundRoundCurve Empty
     let legendDisabledChartStr = legendDisabledChart |> Chart.setLegendEnabled LegendVisibility.Hidden
     let legendDisabledTest =
-        "Legend enabling",
+        "Legend disabling",
         [
-            "|> Chart.setLegendEnabled LegendVisibility.Visible"
+            "|> Chart.setLegendEnabled LegendVisibility.Hidden"
             "Plot without a legend"
         ],
         legendDisabledChartStr
@@ -96,7 +98,7 @@ let main argv =
         "Styling grid lines",
         [
             "|> Chart.setGridLines (GridLines.Enabled(Colour.Green, 2.0))"
-            "Polyline plot with green thin grid lines"
+            "Polyline plot with thick green grid lines"
         ],
         gridStyledLinesChartStr
     
@@ -154,14 +156,14 @@ let main argv =
             paddingRemovedTest
             explicitVisualRegionTest
             //bar chart
-            basicBarChartTest
-            emptyOptionsBarChartTest
-            nameBarChartTest
-            borderFillBarChartTest
-            shadowBarChartTest
-            defaultShadowBarChartTest
-            withoutShadowBarChartTest
-            barWidthBarChartTest
+            basicBarsTest
+            emptyOptionsBarsTest
+            nameBarsTest
+            borderFillBarsTest
+            shadowBarsTest
+            defaultShadowBarsTest
+            withoutShadowBarsTest
+            barWidthBarsTest
             //histogram
             basicHistogramChartTest
             histogramSetEmptyOptionsTest

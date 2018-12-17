@@ -26,7 +26,7 @@ let basicHistogramChartTest =
     basicHistogramChart
 
 let histogramSetEmptyOptionsTest =
-    "set empty options",
+    "Set empty options",
     [
         "setOptions(Options())"
         "The same as previous"
@@ -53,15 +53,15 @@ let histogramSetNameTest =
     "Name is set to Histo",
     [
         "Histogram.setName \"Histo\""
-        "Legend indicates the plot name \"\Histo\""
+        "Legend indicates the plot name \"Histo\""
     ],
     Empty |> Chart.addHistogram  (basicHistogram |> Histogram.setName "Histo")
     
 
 let histogramSetOptionsTest =
-    "set several options",
+    "Set several options",
     [
         "Histogram.setOptions (Options(Name=\"options test\", BinCount=5, Colour=Colour.DarkGray))"
-        ""
+        "Five dark gray bars with the name in a legend"
     ],
     Empty |> Chart.addHistogram  (basicHistogram |> Histogram.setOptions (Options(Name="options test", BinCount=5, Colour=Colour.DarkGray)))
