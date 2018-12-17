@@ -3,6 +3,7 @@ open FSharpIDD.Chart
 open FSharpIDD.Plots.Polyline
 open System.IO
 open System.Diagnostics
+open FSharpIDD.Plots
 
 [<EntryPoint>]
 let main argv = 
@@ -20,10 +21,10 @@ let main argv =
     
     // Specifying some of the polyline options with a series of set... calls
     let curve2 = 
-        createPolyline Xseries Yseries2        
+        createPolyline Xseries Yseries2
         |> setName "Curve 2"
         |> setStrokeColour Colour.Green
-        |> setThickness 10.0        
+        |> setThickness 10.0
     
     // Specifying some of the polyline options with a record recreation
     let curve3 = createPolyline Xseries Yseries3
@@ -43,7 +44,7 @@ let main argv =
         |> Chart.setSize 600 300
         |> Chart.setXlabel "X"
         |> Chart.setYlabel "Parameter value"
-
+    
     // getting HTML that represents the chart
     let generatedChart = chart |> toHTML
 

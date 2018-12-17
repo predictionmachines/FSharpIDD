@@ -14,7 +14,7 @@ module Utils =
 
 
 [<JavaScript>]
-module Plots =    
+module Plots =        
     type DataSeries = float seq
     
     module Polyline =
@@ -253,7 +253,7 @@ module Plots =
                     Size = size
             }
 
-    module BarChart =
+    module Bars =
         /// BarChart plot settings
         type Plot = {
             /// Specifies how to annotate BarChart plot in a legend
@@ -296,11 +296,39 @@ module Plots =
                 barChart with
                     Name = name
             }
+    
+    module Histogram =
+        /// Histogram plot
+        type Plot = {        
+            /// Specifies how to annotate the histogram in a legend
+            Name: string
+            /// Samples to calculate the histogram for
+            Samples: DataSeries        
+            /// The colour of the histogramS
+            Colour: Colour.Colour
+            /// Number of bins in the histogram
+            BinCount: int
+        }
 
+        /// Creates a histogram plot for the passed data
+        let createHistogram samples =
+            {
+                Name = null
+                Samples = samples
+                Colour = Colour.Default
+                BinCount = 30
+            }
+        
+        let setName name hist = {hist with Name = name}
+        let setColour colour hist = {hist with Colour = colour}
+        let setBinCount count hist = {hist with BinCount = count}
+        
+        
     type Plot =
     |   Polyline of Polyline.Plot
     |   Markers of Markers.Plot
-    |   BarChart of BarChart.Plot
+    |   BarChart of Bars.Plot
+    |   Histogram of Histogram.Plot
 
     type SizeType = int
 
@@ -382,6 +410,8 @@ module Chart =
     let addMarkers markers chart = { chart with Plots = Markers(markers)::chart.Plots }
 
     let addBarChart barchart chart = { chart with Plots = BarChart(barchart)::chart.Plots }
+
+    let addHistogram histogram chart = { chart with Plots = Histogram(histogram)::chart.Plots }
 
     /// Sets the textual title that will be placed above the charting area
     let setTitle title chart =  { chart with Title = title}
@@ -489,6 +519,7 @@ module Chart =
                     |   Polyline p -> p.Name <> null
                     |   Markers m -> m.Name <> null
                     |   BarChart b -> b.Name <> null
+                    |   Histogram h -> h.Name <> null
                 List.exists isNameDefined chart.Plots
 
         let chartNode = chartNode |> addAttribute "data-idd-legend-enabled" (if effectiveLegendvisibility then "true" else "false")            
@@ -509,6 +540,21 @@ module Chart =
                 // can't use string builder here as it is not transpilable with WebSharper
                 let str = Seq.fold2 (fun state x y -> state + (sprintf "\t%f\t%f\n" x y)) "\tx\ty\n" xSeries ySeries                                
                 str
+
+        let histogramToBars (h:Histogram.Plot) =
+            let hist = histogram.buildHistogram h.Samples h.BinCount
+            let bars: Bars.Plot = 
+                {
+                    Name = h.Name
+                    X = hist.BinCentres
+                    Y = hist.BinCounters |> Seq.map float
+                    BarWidth = hist.BinWidth
+                    FillColour = h.Colour
+                    BorderColour = h.Colour
+                    Shadow = Colour.Default
+                }
+            bars
+            
 
         let polylineToDiv (p:Polyline.Plot) =                                    
             let styleEntries = [ sprintf "thickness: %.1f" p.Thickness ]
@@ -586,9 +632,9 @@ module Chart =
 
             resultNode
 
-        let barchartToDiv (b: BarChart.Plot) =                                
+        let barchartToDiv (b: Bars.Plot) =                                
             // A number is a size in pixels
-            let styleEntries = [ sprintf "barWidth: %.1f" b.BarWidth ]
+            let styleEntries = [ sprintf "barWidth: %f" b.BarWidth ]
 
             let styleEntries = 
                 match b.FillColour with
@@ -623,11 +669,15 @@ module Chart =
 
             resultNode
     
+        let histogranToDiv (h: Histogram.Plot) =
+            histogramToBars h |> barchartToDiv
+
         let plotToDiv plot =
             match plot with
             |   Polyline p -> polylineToDiv p
             |   Markers m -> markersToDiv m
             |   BarChart b -> barchartToDiv b
+            |   Histogram h -> histogranToDiv h
 
         let plotElems = chart.Plots |> Seq.map plotToDiv
         let chartNode = Seq.fold (fun state elem -> addDiv elem state) chartNode plotElems

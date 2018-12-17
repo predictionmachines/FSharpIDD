@@ -53,6 +53,9 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <Compile Include="..\FSharpIDD\Colour.fs">
+      <Link>Colour.fs</Link>
+    </Compile>
     <Compile Include="..\FSharpIDD\Html.fs">
       <Link>Html.fs</Link>
     </Compile>
