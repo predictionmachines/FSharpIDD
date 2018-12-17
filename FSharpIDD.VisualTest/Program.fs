@@ -6,9 +6,11 @@ open FSharpIDD.Plots
 open FSharpIDD.Chart
 open FSharpIDD.Plots.Polyline
 open FSharpIDD.Plots.Markers
+open FSharpIDD.Plots.BarChart
 open FSharpIDD.Colour
 open PolylineTests
 open MarkersTests
+open BarChartTest
 
 [<EntryPoint>]
 let main argv =
@@ -17,7 +19,7 @@ let main argv =
 
 
     // Empty chart
-    let emptyChartStr = Empty |> Chart.setSize 300 200 |> toHTML
+    let emptyChartStr = Empty |> Chart.setSize 300 200
     let emptyChartTest =
         "Empty chart",
         [
@@ -28,7 +30,7 @@ let main argv =
 
 
     // Legend enabling
-    let legendEnabledChartStr = Empty |> Chart.setLegendEnabled LegendVisibility.Visible |> toHTML
+    let legendEnabledChartStr = Empty |> Chart.setLegendEnabled LegendVisibility.Visible
     let legendEnabledTest =
         "Legend enabling",
         [
@@ -40,7 +42,7 @@ let main argv =
 
     // Legend disabling
     let legendDisabledChart = Chart.addPolyline blue20RoundRoundCurve Empty
-    let legendDisabledChartStr = legendDisabledChart |> Chart.setLegendEnabled LegendVisibility.Hidden |> toHTML
+    let legendDisabledChartStr = legendDisabledChart |> Chart.setLegendEnabled LegendVisibility.Hidden
     let legendDisabledTest =
         "Legend enabling",
         [
@@ -52,7 +54,7 @@ let main argv =
 
     // Navigation enabling
     let navigationEnabledChart = Chart.addMarkers basicMarkersPlot Empty
-    let navigationEnabledChartStr = navigationEnabledChart |> Chart.setNavigationEnabled true |> toHTML
+    let navigationEnabledChartStr = navigationEnabledChart |> Chart.setNavigationEnabled true
     let navigationEnabledTest =
         "Navigation enabling",
         [
@@ -64,7 +66,7 @@ let main argv =
 
     // Hidden Y axis
     let HiddenYAxisChart = Chart.addPolyline blue20RoundRoundCurve Empty
-    let HiddenYAxisChartStr = HiddenYAxisChart |> Chart.setYaxis Axis.Hidden |> toHTML
+    let HiddenYAxisChartStr = HiddenYAxisChart |> Chart.setYaxis Axis.Hidden
     let HiddenYAxisTest =
         "Hidden Y axis",
         [
@@ -76,7 +78,7 @@ let main argv =
 
     // Grid lines disabled
     let gridDisabledLinesChart = Chart.addMarkers basicMarkersPlot Empty
-    let gridDisabledLinesChartStr = gridDisabledLinesChart |> Chart.setGridLines GridLines.Disabled |> toHTML
+    let gridDisabledLinesChartStr = gridDisabledLinesChart |> Chart.setGridLines GridLines.Disabled
     let gridDisabledLinesTest =
         "Hiding grid lines",
         [
@@ -88,7 +90,7 @@ let main argv =
 
     // Styling grid lines
     let gridStyledLinesChart = Chart.addPolyline blue20RoundRoundCurve Empty
-    let gridStyledLinesChartStr = gridStyledLinesChart |> Chart.setGridLines (GridLines.Enabled(Colour.Green, 2.0)) |> toHTML
+    let gridStyledLinesChartStr = gridStyledLinesChart |> Chart.setGridLines (GridLines.Enabled(Colour.Green, 2.0))
     let gridStyledLinesTest =
         "Styling grid lines",
         [
@@ -99,7 +101,7 @@ let main argv =
     
     // Removing data visual padding    
     let paddingRemovedChart = Chart.addPolyline {blue20RoundRoundCurve with Thickness = 1.0} Empty
-    let paddingRemovedChartStr = paddingRemovedChart |> Chart.setVisibleRegion (Autofit 0) |> toHTML
+    let paddingRemovedChartStr = paddingRemovedChart |> Chart.setVisibleRegion (Autofit 0)
     let paddingRemovedTest =
         "Visible padding removed",
         [
@@ -109,7 +111,7 @@ let main argv =
         paddingRemovedChartStr
 
     // Explicit visual region    
-    let explicitVisualRegionStr = Chart.addPolyline blue20RoundRoundCurve Empty |> Chart.setVisibleRegion (Explicit(-1.0,-1.0,15.0,5.0)) |> toHTML
+    let explicitVisualRegionStr = Chart.addPolyline blue20RoundRoundCurve Empty |> Chart.setVisibleRegion (Explicit(-1.0,-1.0,15.0,5.0))
     let explicitVisualRegionTest =
         "Visible region explicitly set",
         [
@@ -121,6 +123,7 @@ let main argv =
     let tests = 
         [
             emptyChartTest
+            //polyline
             presetPolylineTest
             setNonePolylineTest
             nameColourTest
@@ -133,12 +136,14 @@ let main argv =
             titleTest
             axisTest
             basicPolylineTest
+            //markers
             basicMarkersTest
             emptyOptionsMarkersTest
             nameMarkersTest
             borderFillMarkersTest
             shapeMarkersTest
             sizeMarkersTest
+            //other
             legendEnabledTest
             legendDisabledTest
             navigationEnabledTest
@@ -147,9 +152,18 @@ let main argv =
             gridStyledLinesTest
             paddingRemovedTest
             explicitVisualRegionTest
+            //bar chart
+            basicBarChartTest
+            emptyOptionsBarChartTest
+            nameBarChartTest
+            borderFillBarChartTest
+            shadowBarChartTest
+            defaultShadowBarChartTest
+            withoutShadowBarChartTest
+            barWidthBarChartTest
         ]
 
-    let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, chartStr) tests
+    let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, (chartStr |> toHTML)) tests
 
     let generatedDiv = tests |> CollectionToHtml.toHTML 
     
