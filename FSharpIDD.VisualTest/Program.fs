@@ -6,7 +6,7 @@ open FSharpIDD.Plots
 open FSharpIDD.Chart
 open FSharpIDD.Plots.Polyline
 open FSharpIDD.Plots.Markers
-open FSharpIDD.Plots.BarChart
+open FSharpIDD.Plots.Bars
 open FSharpIDD.Colour
 open PolylineTests
 open MarkersTests

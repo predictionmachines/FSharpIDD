@@ -253,7 +253,7 @@ module Plots =
                     Size = size
             }
 
-    module BarChart =
+    module Bars =
         type Shadow =
         |   WithoutShadow
         |   WithShadow of Colour.Colour
@@ -319,7 +319,7 @@ module Plots =
             barchart
         
         /// Creates bar chart plot using the specified set of BarCenters and BarHeights with default settings
-        let createBarChart barcenters barheights = 
+        let createBars barcenters barheights = 
                 {
                     BarCenters = barcenters
                     BarHeights = barheights
@@ -392,14 +392,15 @@ module Plots =
         let setColour colour hist = {hist with Colour = colour}
         let setBinCount count hist = {hist with BinCount = count}
         
-        
     type Plot =
     |   Polyline of Polyline.Plot
     |   Markers of Markers.Plot
-    |   BarChart of Bars.Plot
+    |   Bars of Bars.Plot
     |   Histogram of Histogram.Plot
 
     type SizeType = int
+
+open Plots.Bars
 
 [<JavaScript>]
 module Chart =        
@@ -478,7 +479,7 @@ module Chart =
 
     let addMarkers markers chart = { chart with Plots = Markers(markers)::chart.Plots }
 
-    let addBarChart barchart chart = { chart with Plots = BarChart(barchart)::chart.Plots }
+    let addBars bars chart = { chart with Plots = Bars(bars)::chart.Plots }
 
     let addHistogram histogram chart = { chart with Plots = Histogram(histogram)::chart.Plots }
 
@@ -587,7 +588,7 @@ module Chart =
                     match plot with
                     |   Polyline p -> p.Name <> null
                     |   Markers m -> m.Name <> null
-                    |   BarChart b -> b.Name <> null
+                    |   Bars b -> b.Name <> null
                     |   Histogram h -> h.Name <> null
                 List.exists isNameDefined chart.Plots
 
@@ -611,16 +612,16 @@ module Chart =
                 str
 
         let histogramToBars (h:Histogram.Plot) =
-            let hist = histogram.buildHistogram h.Samples h.BinCount
+            let hist = Histogram.buildHistogram h.Samples h.BinCount
             let bars: Bars.Plot = 
                 {
                     Name = h.Name
-                    X = hist.BinCentres
-                    Y = hist.BinCounters |> Seq.map float
+                    BarCenters = hist.BinCentres
+                    BarHeights = hist.BinCounters |> Seq.map float
                     BarWidth = hist.BinWidth
                     FillColour = h.Colour
                     BorderColour = h.Colour
-                    Shadow = Colour.Default
+                    Shadow = Shadow.WithoutShadow
                 }
             bars
             
@@ -717,11 +718,11 @@ module Chart =
 
             let styleEntries = 
                 match b.Shadow with
-                | BarChart.Shadow.WithShadow c ->
+                | Bars.Shadow.WithShadow c ->
                     match c with
                     |   Colour.Rgb c -> (sprintf "shadow: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
                     |   Colour.Default -> "shadow: grey"::styleEntries
-                | BarChart.Shadow.WithoutShadow -> styleEntries
+                | Bars.Shadow.WithoutShadow -> styleEntries
                 
             let styleEntries = (sprintf "shape: bars")::styleEntries
 
@@ -748,7 +749,7 @@ module Chart =
             match plot with
             |   Polyline p -> polylineToDiv p
             |   Markers m -> markersToDiv m
-            |   BarChart b -> barchartToDiv b
+            |   Bars b -> barchartToDiv b
             |   Histogram h -> histogranToDiv h
 
         let plotElems = chart.Plots |> Seq.map plotToDiv
@@ -763,7 +764,7 @@ module Chart =
                         match colour with
                         | Colour.Rgb c -> (sprintf "stroke: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
                         | Colour.Default -> styleEntries 
-                    let styleValue = System.String.Join<string>("; ",styleEntries)
+                    let styleValue = System.String.Join("; ",styleEntries)
                     createDiv()
                     |> addAttribute "data-idd-plot" "grid"
                     |> addAttribute "data-idd-placement" "center"
