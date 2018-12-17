@@ -272,7 +272,7 @@ module Plots =
             FillColour: Colour.Colour
             /// The colour of a bar border
             BorderColour: Colour.Colour
-            /// The colour of a bar shadowcolour
+            /// Shadow mode: with or without shadow, shadow colour
             Shadow: Shadow
         }
         
@@ -344,7 +344,7 @@ module Plots =
                     FillColour = fillcolour
             }
 
-        /// Sets color of a shadow of a bar
+        /// Sets whether a bar has a shadow and what colour is it
         let setShadow shadow barchart =
             {
                 barchart with
