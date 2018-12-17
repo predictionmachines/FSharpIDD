@@ -225,7 +225,7 @@ module Plots =
                     Name = name
             }
         
-        /// Changes the colour of a marker's border (how are they depicted in the legend)
+        /// Changes the colour of a marker's border
         let setBorderColour bordercolour markers =
             {
                 markers with
@@ -254,29 +254,33 @@ module Plots =
             }
 
     module BarChart =
+        type Shadow =
+        |   WithoutShadow
+        |   WithShadow of Colour.Colour
+
         /// BarChart plot settings
         type Plot = {
             /// Specifies how to annotate BarChart plot in a legend
             Name: string
-            /// Series of X coordinates of bar centers in a bar chart plot
-            X: DataSeries
+            /// Series of bar centers horizontal coordinates. Length of the series equals the number of bars
+            BarCenters: DataSeries
             /// Series of bar heights. Length of the series equals the number of bars
-            Y: DataSeries
+            BarHeights: DataSeries
             /// The width in plot coordinates of one bar in a bar chart plot
             BarWidth: float
             /// The colour with which a bar will be filled
             FillColour: Colour.Colour
             /// The colour of a bar border
             BorderColour: Colour.Colour
-            /// The colour of a bar shadow
-            Shadow: Colour.Colour
+            /// Shadow mode: with or without shadow, shadow colour
+            Shadow: Shadow
         }
         
         type Options() =
             let mutable name: string option = None
             let mutable fillcolour: Colour.Colour option = None
             let mutable bordercolour: Colour.Colour option = None
-            let mutable shadow: Colour.Colour option = None
+            let mutable shadow: Shadow option = None
             let mutable barwidth: float option = None
 
             member s.Name with set v = name <- Some(v)                
@@ -289,6 +293,71 @@ module Plots =
             member s.SpecifiedShadow with internal get() = shadow
             member s.BarWidth with set v = barwidth <- Some(v)
             member s.SpecifiedBarWidth with internal get() = barwidth
+    
+        /// sets several bar chart options at once
+        let setOptions (options:Options) barchart =
+            let barchart =
+                match options.SpecifiedName with
+                | None -> barchart
+                | Some(name) -> {barchart with Name = name}
+            let barchart =
+                match options.SpecifiedFillColour with
+                | None -> barchart
+                | Some(fillcolour) -> {barchart with FillColour = fillcolour}
+            let barchart =
+                match options.SpecifiedBorderColour with
+                | None -> barchart
+                | Some(bordercolour) -> {barchart with BorderColour = bordercolour}
+            let barchart =
+                match options.SpecifiedBarWidth with
+                | None -> barchart
+                | Some(barwidth) -> {barchart with BarWidth = barwidth}
+            let barchart =
+                match options.SpecifiedShadow with
+                | None -> barchart
+                | Some(shadow) -> {barchart with Shadow = shadow}
+            barchart
+        
+        /// Creates bar chart plot using the specified set of BarCenters and BarHeights with default settings
+        let createBarChart barcenters barheights = 
+                {
+                    BarCenters = barcenters
+                    BarHeights = barheights
+                    Name = null
+                    FillColour = Colour.Default
+                    BorderColour = Colour.Default
+                    Shadow = Shadow.WithoutShadow
+                    BarWidth = 1.0
+                }
+        
+        /// Changes a colour of bar's borders
+        let setBorderColour bordercolour barchart =
+            {
+                barchart with
+                    BorderColour = bordercolour
+            }
+        
+        /// Changes a colour with which a bar is filled (how are they depicted in the legend)
+        let setFillColour fillcolour barchart =
+            {
+                barchart with
+                    FillColour = fillcolour
+            }
+
+        /// Sets whether a bar has a shadow and what colour is it
+        let setShadow shadow barchart =
+            {
+                barchart with
+                    Shadow = shadow
+            }
+
+        /// Sets bar width (in plot coords) of a bar
+        let setBarWidth barwidth barchart =
+            {
+                barchart with
+                    BarWidth = barwidth
+            }
+        
         
         /// Changes the name of bar chart plot (how it is depicted in the legend)
         let setName name barChart =
@@ -587,7 +656,7 @@ module Chart =
             resultNode
 
         let barchartToDiv (b: BarChart.Plot) =                                
-            // A number is a size in pixels
+            // A number is a size in plot coords
             let styleEntries = [ sprintf "barWidth: %.1f" b.BarWidth ]
 
             let styleEntries = 
@@ -602,8 +671,11 @@ module Chart =
 
             let styleEntries = 
                 match b.Shadow with
-                | Colour.Rgb c -> (sprintf "shadow: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
-                | Colour.Default -> styleEntries
+                | BarChart.Shadow.WithShadow c ->
+                    match c with
+                    |   Colour.Rgb c -> (sprintf "shadow: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
+                    |   Colour.Default -> "shadow: grey"::styleEntries
+                | BarChart.Shadow.WithoutShadow -> styleEntries
                 
             let styleEntries = (sprintf "shape: bars")::styleEntries
 
@@ -613,7 +685,7 @@ module Chart =
                 createDiv()
                 |> addAttribute "data-idd-plot" "markers"
                 |> addAttribute "data-idd-style" styleValue
-                |> addText (getDataDom b.X b.Y)
+                |> addText (getDataDom b.BarCenters b.BarHeights)
                         
             let resultNode =
                 if System.String.IsNullOrEmpty b.Name then
@@ -641,7 +713,7 @@ module Chart =
                         match colour with
                         | Colour.Rgb c -> (sprintf "stroke: rgb(%d,%d,%d)" c.R c.G c.B)::styleEntries
                         | Colour.Default -> styleEntries 
-                    let styleValue = System.String.Join("; ",styleEntries)
+                    let styleValue = System.String.Join<string>("; ",styleEntries)
                     createDiv()
                     |> addAttribute "data-idd-plot" "grid"
                     |> addAttribute "data-idd-placement" "center"
