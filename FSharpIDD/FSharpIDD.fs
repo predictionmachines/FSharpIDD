@@ -431,14 +431,17 @@ module Plots =
             histogram
     
     module Heatmap =
+        type Palette =
+        |   Palette of string
+        |   Default
         /// Heatmap plot settings
         type Plot = {
             /// Specifies how to annotate Heatmap plot in a legend
             Name: string
             /// X coords of grid points. If missing is considered to be sequential integers. Should have at least 2 elements
-            X: DataSeries
+            X: float[]
             /// Y coords of grid points. If missing is considered to be sequential integers. Should have at least 2 elements
-            Y: DataSeries
+            Y: float[]
             /// Two-dimensional array of values in grid points. If value is NaN, the point is skipped
             Data: float[,]
             /// Colour palette
@@ -512,6 +515,7 @@ module Plots =
     |   Markers of Markers.Plot
     |   Bars of Bars.Plot
     |   Histogram of Histogram.Plot
+    |   Heatmap of Heatmap.Plot
 
     type SizeType = int
 
@@ -599,6 +603,8 @@ module Chart =
     let addBars bars chart = { chart with Plots = Bars(bars)::chart.Plots }
 
     let addHistogram histogram chart = { chart with Plots = Histogram(histogram)::chart.Plots }
+
+    let addHeatmap heatmap chart = { chart with Plots = Heatmap(heatmap)::chart.Plots }
 
     /// Sets the textual title that will be placed above the charting area
     let setTitle title chart =  { chart with Title = title}
@@ -733,6 +739,7 @@ module Chart =
                     |   Markers m -> m.Name <> null
                     |   Bars b -> b.Name <> null
                     |   Histogram h -> h.Name <> null
+                    |   Heatmap hm -> hm.Name <> null
                 List.exists isNameDefined chart.Plots
 
         let chartNode = chartNode |> addAttribute "data-idd-legend-enabled" (if effectiveLegendvisibility then "true" else "false")            
@@ -902,15 +909,42 @@ module Chart =
 
             resultNode
     
-        let histogranToDiv (h: Histogram.Plot) =
+        let histogramToDiv (h: Histogram.Plot) =
             histogramToBars h |> barchartToDiv
+        
+        let heatmapToDiv (hm: Heatmap.Plot) =                                    
+            let styleEntries = [ sprintf "opacity: %f" hm.Opacity ]
+            let styleEntries = 
+                let paletteStr =
+                    match hm.Palette with
+                    | Heatmap.Palette.Palette -> hm.Palette
+                    | Heatmap.Palette.Default -> styleEntries
+                (sprintf "colorPalette: %s" paletteStr)::styleEntries
+
+            let styleValue = System.String.Join("; ", styleEntries)
+
+            let resultNode =
+                createDiv()
+                |> addAttribute "data-idd-plot" "heatmap"
+                |> addAttribute "data-idd-style" styleValue
+                |> addAttribute "data-idd-datasource" "InteractiveDataDisplay.readBase64"
+                |> addText (getHeatMapDataDom hm.X hm.Y hm.Data)
+                        
+            let resultNode =
+                if System.String.IsNullOrEmpty hm.Name then
+                    resultNode
+                else
+                    resultNode |> addAttribute "data-idd-name" hm.Name  
+
+            resultNode
 
         let plotToDiv plot =
             match plot with
             |   Polyline p -> polylineToDiv p
             |   Markers m -> markersToDiv m
             |   Bars b -> barchartToDiv b
-            |   Histogram h -> histogranToDiv h
+            |   Histogram h -> histogramToDiv h
+            |   Heatmap hm -> heatmapToDiv hm
 
         let plotElems = chart.Plots |> Seq.map plotToDiv
         let chartNode = Seq.fold (fun state elem -> addDiv elem state) chartNode plotElems
