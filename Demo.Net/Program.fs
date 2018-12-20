@@ -40,7 +40,7 @@ let main argv =
         |> Chart.addPolyline curve1
         |> Chart.addPolyline curve2
         |> Chart.addPolyline curve3
-        |> Chart.setTitle "The demo chart"
+        |> Chart.setTitle "The demo chart"       
         |> Chart.setSize 600 300
         |> Chart.setXlabel "X"
         |> Chart.setYlabel "Parameter value"
