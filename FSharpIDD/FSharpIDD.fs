@@ -11,6 +11,17 @@ module Utils =
     [<Inline "Math.floor(new Date().valueOf() * Math.random()).toString()">]
     let getUniqueId(): string = 
         System.Guid.NewGuid().ToString()
+    
+    [<Inline "throw \"not implemented\"">]
+    let encodeFloat64SeqBase64 data =
+        let bytes = data |> Seq.collect (fun (elem:float) -> System.BitConverter.GetBytes(elem)) |> Array.ofSeq
+        let base64str = System.Convert.ToBase64String bytes
+        base64str
+
+    let encodeStringSeqBase64 (data:string) =
+        let bytes = data |> System.Text.Encoding.ASCII.GetBytes
+        let base64str = System.Convert.ToBase64String bytes
+        base64str
 
 
 [<JavaScript>]
@@ -738,10 +749,24 @@ module Chart =
             else
                 chartNode
 
-        let getDataDom xSeries ySeries =
-                // can't use string builder here as it is not transpilable with WebSharper
-                let str = Seq.fold2 (fun state x y -> state + (sprintf "\t%f\t%f\n" x y)) "\tx\ty\n" xSeries ySeries                                
-                str
+        let getXYDataDom xSeries ySeries =                
+                sprintf "x float64.1D %s\ny float64.1D %s" (Utils.encodeFloat64SeqBase64 xSeries) (Utils.encodeFloat64SeqBase64 ySeries)
+
+        let getHeatMapDataDom (xSeries:float array) (ySeries: float array) (valArray: float [,]) =
+            let outerDimLen,innerDimLen = Array2D.length1 valArray, Array2D.length2 valArray            
+            let flattenedData = 
+                Array.ofSeq <|                
+                seq {
+                    for i in 0 .. (outerDimLen-1) do 
+                        for j in 0 .. (innerDimLen-1) do
+                            yield valArray.[i,j]
+                }
+                
+            sprintf "x float64.1D %s\ny float64.1D %s\nvalues float64.2D %i %s"
+                <| Utils.encodeFloat64SeqBase64 xSeries
+                <| Utils.encodeFloat64SeqBase64 ySeries
+                <| innerDimLen
+                <| Utils.encodeFloat64SeqBase64 flattenedData
 
         let histogramToBars (h:Histogram.Plot) =
             let hist = Histogram.buildHistogram h.Samples h.BinCount
@@ -784,7 +809,8 @@ module Chart =
                 createDiv()
                 |> addAttribute "data-idd-plot" "polyline"
                 |> addAttribute "data-idd-style" styleValue
-                |> addText (getDataDom p.X p.Y)
+                |> addAttribute "data-idd-datasource" "InteractiveDataDisplay.readBase64"
+                |> addText (getXYDataDom p.X p.Y)
                         
             let resultNode =
                 if System.String.IsNullOrEmpty p.Name then
@@ -824,7 +850,8 @@ module Chart =
                 createDiv()
                 |> addAttribute "data-idd-plot" "markers"
                 |> addAttribute "data-idd-style" styleValue
-                |> addText (getDataDom m.X m.Y)
+                |> addAttribute "data-idd-datasource" "InteractiveDataDisplay.readBase64"
+                |> addText (getXYDataDom m.X m.Y)
                         
             let resultNode =
                 if System.String.IsNullOrEmpty m.Name then
@@ -864,7 +891,8 @@ module Chart =
                 createDiv()
                 |> addAttribute "data-idd-plot" "markers"
                 |> addAttribute "data-idd-style" styleValue
-                |> addText (getDataDom b.BarCenters b.BarHeights)
+                |> addAttribute "data-idd-datasource" "InteractiveDataDisplay.readBase64"
+                |> addText (getXYDataDom b.BarCenters b.BarHeights)
                         
             let resultNode =
                 if System.String.IsNullOrEmpty b.Name then
