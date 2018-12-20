@@ -373,7 +373,7 @@ module Plots =
             Name: string
             /// Samples to calculate the histogram for
             Samples: DataSeries        
-            /// The colour of the histogramS
+            /// The colour of the histogram
             Colour: Colour.Colour
             /// Number of bins in the histogram
             BinCount: int
@@ -439,6 +439,8 @@ module Chart =
     |   Hidden
     /// Numeric axis of automatically calculated and placed numerical ticks with values
     |   Numeric
+    /// Labelled axis. Uses array with string labels(lables[]) and array of numerical values (ticks[]), where these labels will be placed
+    |   Labelled of ticks: float seq * labels: string seq
 
     type GridLines =
     |   Disabled
@@ -569,6 +571,12 @@ module Chart =
                 chartNode |> addDiv containerNode
             else
                 chartNode
+            
+
+        let getDataDomWithTicksLabels ticks labels =
+                // can't use string builder here as it is not transpilable with WebSharper
+                let str = Seq.fold2 (fun state tick label -> state + (sprintf "\t%f\t%s\n" tick label)) "ticks\tlabels\n" ticks labels
+                str
 
         let chartNode,yAxisID = 
             match chart.Yaxis with
@@ -581,6 +589,16 @@ module Chart =
                     |> addAttribute "data-idd-axis" "numeric"
                     |> addAttribute "data-idd-placement" "left"
                     |> addAttribute "style" "position: relative;"                    
+                (chartNode |> addDiv axisNode),(Some id)
+            |   Axis.Labelled (ticks, labels) ->
+                let id = Utils.getUniqueId()
+                let axisNode =                    
+                    createDiv()
+                    |> addAttribute "id" id
+                    |> addAttribute "data-idd-axis" "labels"
+                    |> addAttribute "data-idd-placement" "left"
+                    |> addAttribute "style" "position: relative;"
+                    |> addText (getDataDomWithTicksLabels ticks labels)
                 (chartNode |> addDiv axisNode),(Some id)
         
         let chartNode = 
@@ -605,7 +623,17 @@ module Chart =
                     |> addAttribute "data-idd-axis" "numeric"
                     |> addAttribute "data-idd-placement" "bottom"
                     |> addAttribute "style" "position: relative;"                    
-                (chartNode |> addDiv axisNode),(Some id)               
+                (chartNode |> addDiv axisNode),(Some id)  
+            |   Axis.Labelled (ticks, labels)->
+                let id = Utils.getUniqueId()
+                let axisNode =                    
+                    createDiv()
+                    |> addAttribute "id" id
+                    |> addAttribute "data-idd-axis" "labels"
+                    |> addAttribute "data-idd-placement" "bottom"
+                    |> addAttribute "style" "position: relative;"
+                    |> addText (getDataDomWithTicksLabels ticks labels)
+                (chartNode |> addDiv axisNode),(Some id)             
         
         let effectiveLegendvisibility =
             match chart.IsLegendEnabled with
