@@ -44,8 +44,8 @@ let main argv =
 
 
     // Legend disabling
-    let legendDisabledChart = Chart.addPolyline blue20RoundRoundCurve Empty
-    let legendDisabledChartStr = legendDisabledChart |> Chart.setLegendEnabled LegendVisibility.Hidden
+    let blue20RoundRoundCurveChart = Chart.addPolyline blue20RoundRoundCurve Empty
+    let legendDisabledChartStr = blue20RoundRoundCurveChart |> Chart.setLegendEnabled LegendVisibility.Hidden
     let legendDisabledTest =
         "Legend disabling",
         [
@@ -68,8 +68,7 @@ let main argv =
 
 
     // Hidden Y axis
-    let HiddenYAxisChart = Chart.addPolyline blue20RoundRoundCurve Empty
-    let HiddenYAxisChartStr = HiddenYAxisChart |> Chart.setYaxis Axis.Hidden
+    let HiddenYAxisChartStr = blue20RoundRoundCurveChart |> Chart.setYaxis Axis.Hidden
     let HiddenYAxisTest =
         "Hidden Y axis",
         [
@@ -92,8 +91,7 @@ let main argv =
 
 
     // Styling grid lines
-    let gridStyledLinesChart = Chart.addPolyline blue20RoundRoundCurve Empty
-    let gridStyledLinesChartStr = gridStyledLinesChart |> Chart.setGridLines (GridLines.Enabled(Colour.Green, 2.0))
+    let gridStyledLinesChartStr = blue20RoundRoundCurveChart |> Chart.setGridLines (GridLines.Enabled(Colour.Green, 2.0))
     let gridStyledLinesTest =
         "Styling grid lines",
         [
@@ -114,7 +112,7 @@ let main argv =
         paddingRemovedChartStr
 
     // Explicit visual region    
-    let explicitVisualRegionStr = Chart.addPolyline blue20RoundRoundCurve Empty |> Chart.setVisibleRegion (Explicit(-1.0,-1.0,15.0,5.0))
+    let explicitVisualRegionStr = blue20RoundRoundCurveChart |> Chart.setVisibleRegion (Explicit(-1.0,-1.0,15.0,5.0))
     let explicitVisualRegionTest =
         "Visible region explicitly set",
         [
@@ -122,6 +120,18 @@ let main argv =
             "Polyline is in lower-left part of the visible region"
         ],
         explicitVisualRegionStr
+
+    // Labelled axis
+    let ticks = [1.0; 3.0; 5.0; 7.0; 9.0; 2.0; 4.0; 6.0; 8.0; 10.0]
+    let labels = ["a"; "b"; "c"; "d"; "e"; "f"; "g"; "h"; "i"; "j"]
+    let labelledAxisStr = blue20RoundRoundCurveChart |> Chart.setXaxis (Axis.Labelled(ticks, labels))
+    let labelledAxisTest =
+        "Labelled axis: ticks and labels",
+        [
+            "|> Chart.setXaxis (Axis.Labelled(ticks, labels))"
+            "Polyline with a labelled horizontal axis"
+        ],
+        labelledAxisStr
 
     let tests = 
         [
@@ -155,6 +165,7 @@ let main argv =
             gridStyledLinesTest
             paddingRemovedTest
             explicitVisualRegionTest
+            labelledAxisTest
             //bar chart
             basicBarsTest
             emptyOptionsBarsTest
