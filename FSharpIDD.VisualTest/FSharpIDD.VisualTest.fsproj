@@ -59,6 +59,7 @@
     <Compile Include="MarkersTests.fs" />
     <Compile Include="BarsTests.fs" />
     <Compile Include="HistogramTests.fs" />
+    <Compile Include="HeatMapTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

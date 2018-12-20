@@ -12,6 +12,7 @@ open PolylineTests
 open MarkersTests
 open BarsTest
 open HistogramTests
+open HeatMapTests
 
 [<EntryPoint>]
 let main argv =
@@ -182,6 +183,10 @@ let main argv =
             histogramSetColourTest
             histogramSetNameTest
             histogramSetOptionsTest
+            //heatmaps
+            basicGradientHeatmapTest
+            basicDescreteHeatmapTest
+            corrMapTest
         ]
 
     let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, (chartStr |> toHTML)) tests

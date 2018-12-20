@@ -432,7 +432,7 @@ module Plots =
     
     module Heatmap =
         type Palette =
-        |   Palette of string
+        |   IddPaletteString of string
         |   Default
         /// Heatmap plot settings
         type Plot = {
@@ -445,7 +445,7 @@ module Plots =
             /// Two-dimensional array of values in grid points. If value is NaN, the point is skipped
             Data: float[,]
             /// Colour palette
-            Palette: string
+            Palette: Palette
             /// Heatmap transparency in [0, 1] domain, where 0 - transparent, 1 - opaque
             Opacity: float
         }
@@ -471,7 +471,7 @@ module Plots =
             let heatmap =
                 match options.SpecifiedPalette with
                 | None -> heatmap
-                | Some(palette) -> {heatmap with Palette = palette}
+                | Some(palette) -> {heatmap with Palette = IddPaletteString palette}
             let heatmap =
                 match options.SpecifiedOpacity with
                 | None -> heatmap
@@ -485,7 +485,7 @@ module Plots =
                     X = x
                     Y = y
                     Data = data
-                    Palette = null
+                    Palette = Palette.Default
                     Opacity = 1.0
                 }
         
@@ -914,13 +914,11 @@ module Chart =
         
         let heatmapToDiv (hm: Heatmap.Plot) =                                    
             let styleEntries = [ sprintf "opacity: %f" hm.Opacity ]
-            let styleEntries = 
-                let paletteStr =
-                    match hm.Palette with
-                    | Heatmap.Palette.Palette -> hm.Palette
-                    | Heatmap.Palette.Default -> styleEntries
-                (sprintf "colorPalette: %s" paletteStr)::styleEntries
-
+            let styleEntries =                 
+                match hm.Palette with
+                | Heatmap.Palette.IddPaletteString(definition) -> (sprintf "colorPalette: %s" definition)::styleEntries
+                | Heatmap.Palette.Default -> styleEntries
+                
             let styleValue = System.String.Join("; ", styleEntries)
 
             let resultNode =
