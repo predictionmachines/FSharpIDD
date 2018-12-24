@@ -36,7 +36,6 @@ module Html=
         let str = str.Replace("\"","\\\"")
         Valid str
 
-
     let internal guardText (str:string) : HtmlString = 
         let str = str.Replace(">","&gt;")
         let str = str.Replace("<","&lt;")
@@ -50,11 +49,18 @@ module Html=
             Children = []
         }
 
-    /// Adds the text inside the div (inner content)
+    /// Adds a text inside the div (inner content)
     let addText text div = 
         {
             div with
-                Children = (Text (guardText text)):: div.Children
+                Children = (Text (guardText text))::div.Children
+        }
+
+    /// Adds a div inside the div (inner html)
+    let addInnerHtml htmlString div = 
+        {
+            div with
+                Children = (Text (Valid htmlString))::div.Children
         }
 
     let addDiv child parent = 

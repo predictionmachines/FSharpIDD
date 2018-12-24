@@ -2,43 +2,33 @@
 
 open System.Xml
 open System.IO
+open FSharpIDD.Html
 
 let toHTML (sampleList: (string*(string list)*string)list) = 
-    let root = XmlDocument()
+    let testsContainer = addAttribute "class" "test-samples-container" (createDiv())
 
-    let samplesNode = root.CreateElement("div")
-    samplesNode.SetAttribute("class", "test-samples-container")
-    root.AppendChild(samplesNode) |> ignore
-
-    let arrangeSample sample =
+    let arrangeSample oldNode sample =
         let (chartName: string, chartDescrs: string list, chartSample: string) = sample
-
-        let sampleNode = root.CreateElement("div")
-        sampleNode.SetAttribute("class", "test-sample")
-
-        let chartNameDiv = root.CreateElement("div")
-        chartNameDiv.SetAttribute("class", "test-sample-name")
-        chartNameDiv.InnerText <- chartName
-        sampleNode.AppendChild(chartNameDiv) |> ignore
-
-        let addDescrDiv descr =
-            let chartDescDiv = root.CreateElement("div")
-            chartDescDiv.SetAttribute("class", "test-sample-desc")
-            chartDescDiv.InnerText <- descr
-            sampleNode.AppendChild(chartDescDiv) |> ignore
-
-        chartDescrs |> Seq.iter addDescrDiv
-
-        let chartDiv = root.CreateDocumentFragment()
-        chartDiv.InnerXml <- chartSample
-        sampleNode.AppendChild(chartDiv) |> ignore
-
-        samplesNode.AppendChild(sampleNode) |> ignore
-
-    sampleList |> Seq.iter arrangeSample
         
-    use writer = new StringWriter()
-    use xmlWriter = new XmlTextWriter(writer)
-    root.WriteContentTo(xmlWriter)
-    let res = writer.ToString()
-    res
+        let sampleNode = addAttribute "class" "test-sample" (createDiv())
+        
+        let chartNameDiv = addAttribute "class" "test-sample-name" (createDiv())
+        let sampleNode = addDiv (addInnerHtml chartSample (createDiv())) sampleNode
+
+        let addDescrDiv oldNode descr =
+            addDiv (addText descr (addAttribute "class" "test-sample-desc" (createDiv()))) oldNode
+                
+        let sampleNode = chartDescrs |> Seq.fold addDescrDiv sampleNode
+
+        let sampleNode = addDiv (addText chartName chartNameDiv) sampleNode
+        
+        addDiv sampleNode oldNode
+
+    let testsContainer = sampleList |> Seq.fold arrangeSample testsContainer
+
+    let revertedTests = {
+        testsContainer with
+            Children = List.rev testsContainer.Children
+        }
+    
+    divToStr (addDiv revertedTests (createDiv()))
