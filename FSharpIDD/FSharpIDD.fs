@@ -525,13 +525,31 @@ open Plots.Bars
 module Chart =        
     open Plots
 
+    type LabelledAxisRecord = {
+        Ticks: float seq
+        Labels: string seq
+        Angle: float
+    }
+
+    let LabelledAxis : LabelledAxisRecord = {
+        Ticks = [ 1.0; 2.0; 3.0; 4.0 ]
+        Labels = [ "1"; "2"; "3"; "4" ]
+        Angle = 0.0
+    }
+
+    /// Sets ticks and labels of a labelled axis
+    let setTicksLabels ticks labels labelledAxis =  { labelledAxis with Ticks = ticks; Labels = labels }
+
+    /// Sets tilt angle of labels on a labelled axis
+    let setLabelsAngle angle labelledAxis =  { labelledAxis with Angle = angle }
+
     type Axis = 
     /// The axis is disabled (not visible)
     |   Hidden
     /// Numeric axis of automatically calculated and placed numerical ticks with values
     |   Numeric
-    /// Labelled axis. Uses array with string labels(lables[]) and array of numerical values (ticks[]), where these labels will be placed
-    |   Labelled of ticks: float seq * labels: string seq
+    /// Labelled axis. Uses array with string labels(lables[]) and array of numerical values (ticks[]), where these labels will be placed. Also has an angle parameter
+    |   Labelled of LabelledAxisRecord
 
     type GridLines =
     |   Disabled
@@ -683,14 +701,20 @@ module Chart =
                     |> addAttribute "data-idd-placement" "left"
                     |> addAttribute "style" "position: relative;"                    
                 (chartNode |> addDiv axisNode),(Some id)
-            |   Axis.Labelled (ticks, labels) ->
+            |   Axis.Labelled labelledAxisRecord ->
+                let (ticks, labels, angle) = labelledAxisRecord.Ticks, labelledAxisRecord.Labels, labelledAxisRecord.Angle
                 let id = Utils.getUniqueId()
+                let tiltString = 
+                    if (labelledAxisRecord.Angle = 0.0)
+                    then ""
+                    else "rotate: true; rotateAngle: " + (sprintf "%f;" labelledAxisRecord.Angle)
                 let axisNode =                    
                     createDiv()
                     |> addAttribute "id" id
                     |> addAttribute "data-idd-axis" "labels"
                     |> addAttribute "data-idd-placement" "left"
                     |> addAttribute "style" "position: relative;"
+                    |> addAttribute "data-idd-style" tiltString
                     |> addText (getDataDomWithTicksLabels ticks labels)
                 (chartNode |> addDiv axisNode),(Some id)
         
@@ -717,7 +741,8 @@ module Chart =
                     |> addAttribute "data-idd-placement" "bottom"
                     |> addAttribute "style" "position: relative;"                    
                 (chartNode |> addDiv axisNode),(Some id)  
-            |   Axis.Labelled (ticks, labels)->
+            |   Axis.Labelled labelledAxisRecord ->
+                let (ticks, labels, angle) = labelledAxisRecord.Ticks, labelledAxisRecord.Labels, labelledAxisRecord.Angle
                 let id = Utils.getUniqueId()
                 let axisNode =                    
                     createDiv()
@@ -726,6 +751,10 @@ module Chart =
                     |> addAttribute "data-idd-placement" "bottom"
                     |> addAttribute "style" "position: relative;"
                     |> addText (getDataDomWithTicksLabels ticks labels)
+                let axisNode = 
+                    if (labelledAxisRecord.Angle = 0.0)
+                    then axisNode
+                    else (axisNode |> addAttribute "data-idd-style" ("rotate: true; rotateAngle: " + (sprintf "%f;" labelledAxisRecord.Angle)))
                 (chartNode |> addDiv axisNode),(Some id)             
         
         let effectiveLegendvisibility =

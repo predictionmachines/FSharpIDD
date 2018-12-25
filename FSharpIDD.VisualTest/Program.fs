@@ -125,7 +125,7 @@ let main argv =
     // Labelled axis
     let ticks = [1.0; 3.0; 5.0; 7.0; 9.0; 2.0; 4.0; 6.0; 8.0; 10.0]
     let labels = ["a"; "b"; "c"; "d"; "e"; "f"; "g"; "h"; "i"; "j"]
-    let labelledAxisStr = blue20RoundRoundCurveChart |> Chart.setXaxis (Axis.Labelled(ticks, labels))
+    let labelledAxisStr = blue20RoundRoundCurveChart |> Chart.setXaxis (Labelled(LabelledAxis |> setTicksLabels ticks labels))
     let labelledAxisTest =
         "Labelled axis: ticks and labels",
         [
