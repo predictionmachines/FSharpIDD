@@ -531,12 +531,6 @@ module Chart =
         Angle: float
     }
 
-    let LabelledAxis : LabelledAxisRecord = {
-        Ticks = [ 1.0; 2.0; 3.0; 4.0 ]
-        Labels = [ "1"; "2"; "3"; "4" ]
-        Angle = 0.0
-    }
-
     /// Sets ticks and labels of a labelled axis
     let setTicksLabels ticks labels labelledAxis =  { labelledAxis with Ticks = ticks; Labels = labels }
 
@@ -550,6 +544,30 @@ module Chart =
     |   Numeric
     /// Labelled axis. Uses array with string labels(lables[]) and array of numerical values (ticks[]), where these labels will be placed. Also has an angle parameter
     |   Labelled of LabelledAxisRecord
+    
+    /// Creates a labelled axis using the specified ticks and labels arrays, tilt angle
+    let createTiltedLabelledAxis ticks labels angle = 
+        Labelled {
+            Ticks = ticks
+            Labels = labels
+            Angle = angle
+        }
+    
+    /// Creates a labelled axis using the specified ticks and labels arrays
+    let createLabelledAxis ticks labels = 
+        Labelled {
+            Ticks = ticks
+            Labels = labels
+            Angle = 0.0
+        }
+    
+    /// Creates a labelled axis using the specified ticks and labels arrays
+    let createTiltedLabelledAxisRecord ticks labels angle = 
+        {
+            Ticks = ticks
+            Labels = labels
+            Angle = angle
+        }
 
     type GridLines =
     |   Disabled
@@ -686,7 +704,15 @@ module Chart =
 
         let getDataDomWithTicksLabels ticks labels =
                 // can't use string builder here as it is not transpilable with WebSharper
-                let str = Seq.fold2 (fun state tick label -> state + (sprintf "\t%f\t%s\n" tick label)) "ticks\tlabels\n" ticks labels
+                let ticks_array = Array.ofSeq ticks
+                let labels_array = Array.ofSeq labels
+                let labels_seq_final =
+                    if((Array.length ticks_array) = (Array.length labels_array))
+                    then
+                        labels
+                    else
+                        Seq.append labels [""]
+                let str = Seq.fold2 (fun state tick label -> state + (sprintf "\t%f\t%s\n" tick label)) "ticks\tlabels\n" ticks labels_seq_final
                 str
 
         let chartNode,yAxisID = 
