@@ -51,7 +51,8 @@ let labelsRev = List.rev labels
 
 let corrMap =
     Heatmap.createHeatmap corrMapX corrMapX corrMapVals
-    |> Heatmap.setPalette (Heatmap.Palette.IddPaletteString "-1.0=blue,white,red=1.0")
+    |> Heatmap.setName "Correlation"
+    |> Heatmap.setPalette (Heatmap.Palette.IddPaletteString "-1=red,#ff3333=-0.8=#ff3333,#ff6666=-0.6=#ff6666,#ff9999=-0.4=#ff9999,#ffcccc=-0.2=#ffcccc,white=0.0=white,#ccccff=0.2=#ccccff,#9999ff=0.4=#9999ff,#6666ff=0.6=#6666ff,#3333ff=0.8=#3333ff,blue=1")
 
 let corrMapTest =
     "Correlation map between 6 species",
@@ -59,8 +60,14 @@ let corrMapTest =
         "|> Heatmap.setPalette (Heatmap.Palette.IddPaletteString '-1.0=blue,white,red=1.0')"
         "Correlation map"
     ],
-    Empty
-    |> Chart.setSize 600 400
-    |> Chart.addHeatmap corrMap 
-    |> Chart.setXaxis (createTiltedLabelledAxis ticks labels 90.0)
-    |> Chart.setYaxis (createLabelledAxis ticks labelsRev)
+     {
+        Empty with            
+            Width = 300
+            Height = 200
+            Xaxis = createTiltedLabelledAxis ticks labels 90.0
+            Yaxis = createLabelledAxis ticks labelsRev
+            IsLegendEnabled = LegendVisibility.Hidden
+            IsTooltipPlotCoordsEnabled=false
+            Title = "Correlation"
+     }    
+    |> Chart.addHeatmap corrMap

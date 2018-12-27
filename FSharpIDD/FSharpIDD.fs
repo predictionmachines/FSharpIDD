@@ -561,13 +561,6 @@ module Chart =
             Angle = 0.0
         }
     
-    /// Creates a labelled axis using the specified ticks and labels arrays
-    let createTiltedLabelledAxisRecord ticks labels angle = 
-        {
-            Ticks = ticks
-            Labels = labels
-            Angle = angle
-        }
 
     type GridLines =
     |   Disabled
