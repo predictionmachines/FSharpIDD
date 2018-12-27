@@ -125,12 +125,24 @@ let main argv =
     // Labelled axis
     let ticks = [1.0; 3.0; 5.0; 7.0; 9.0; 2.0; 4.0; 6.0; 8.0; 10.0]
     let labels = ["a"; "b"; "c"; "d"; "e"; "f"; "g"; "h"; "i"; "j"]
-    let labelledAxisStr = blue20RoundRoundCurveChart |> Chart.setXaxis (Axis.Labelled(ticks, labels))
+    let labelledAxisStr = blue20RoundRoundCurveChart |> Chart.setXaxis (createLabelledAxis ticks labels)
     let labelledAxisTest =
         "Labelled axis: ticks and labels",
         [
-            "|> Chart.setXaxis (Axis.Labelled(ticks, labels))"
+            "|> Chart.setXaxis (createLabelledAxis ticks labels)"
             "Polyline with a labelled horizontal axis"
+        ],
+        labelledAxisStr
+
+    // Labelled axis with tilted labels
+    let ticks = [1.0; 2.0; 3.0; 4.0; 5.0; 6.0]
+    let labels = ["one"; "two"; "three"; "four"; "five"]
+    let labelledAxisStr = blue20RoundRoundCurveChart |> Chart.setXaxis (createTiltedLabelledAxis ticks labels 30.0)
+    let labelledAxisTiltedTest =
+        "Labelled axis: ticks and labels with tilted labels",
+        [
+            "|> Chart.setXaxis (createTiltedLabelledAxis ticks labels 30.0)"
+            "Polyline with a horizontal axis, where labels are tilted"
         ],
         labelledAxisStr
 
@@ -167,6 +179,7 @@ let main argv =
             paddingRemovedTest
             explicitVisualRegionTest
             labelledAxisTest
+            labelledAxisTiltedTest
             //bar chart
             basicBarsTest
             emptyOptionsBarsTest
