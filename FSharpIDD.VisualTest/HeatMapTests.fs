@@ -44,8 +44,8 @@ let corrMapX = Array.init<float> 7 (fun i -> float(i))
 
 let corrMapVals = Array2D.init 6 6 (fun x y -> let y = 5-y in if x >= y then nan else (1.0 - 0.4 * float(abs(y - x))))
 
-let ticks = Array.init 6 (fun idx -> 0.5+float(idx))
-let labels = ["a"; "b"; "c"; "d"; "e"; "f"]
+let ticks = Array.init 7 (fun idx -> float(idx))
+let labels = ["one"; "two"; "three"; "four"; "five"; "six"]
 let labelsRev = List.rev labels
     
 
@@ -62,5 +62,5 @@ let corrMapTest =
     Empty
     |> Chart.setSize 600 400
     |> Chart.addHeatmap corrMap 
-    |> Chart.setXaxis (Labelled(ticks, labels))
-    |> Chart.setYaxis (Labelled(ticks, labelsRev))
+    |> Chart.setXaxis (createTiltedLabelledAxis ticks labels 90.0)
+    |> Chart.setYaxis (createLabelledAxis ticks labelsRev)
