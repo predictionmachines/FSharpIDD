@@ -577,6 +577,8 @@ module Chart =
         IsLegendEnabled: LegendVisibility
         /// Whether the chart visible area can be navigated with a mouse or touch gestures
         IsNavigationEnabled: bool
+        /// Whether the plot coordinates of the point under the mouse are shown in the tooltip
+        IsTooltipPlotCoordsEnabled: bool
         /// Which visible rectangle is displayed by the chart
         VisibleRegion : VisibleRegion
     }
@@ -594,6 +596,7 @@ module Chart =
         IsNavigationEnabled = true
         Plots = []
         VisibleRegion = VisibleRegion.Autofit 20
+        IsTooltipPlotCoordsEnabled = true
     }
 
     let addPolyline polyline chart = { chart with Plots = Polyline(polyline)::chart.Plots }
@@ -648,7 +651,7 @@ module Chart =
             |> addAttribute "class" "fsharp-idd" 
             |> addAttribute "data-idd-plot" "figure" 
             |> addAttribute "style" (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
-            |> addVisibleRegionAttribute
+            |> addVisibleRegionAttribute        
                 
         let chartNode = 
             if chart.Ylabel <> null then
@@ -667,7 +670,7 @@ module Chart =
             
 
         let getDataDomWithTicksLabels ticks labels =
-                // can't use string builder here as it is not transpilable with WebSharper
+                // can't use string builder here as it is not transpilable with WebSharper                
                 let str = Seq.fold2 (fun state tick label -> state + (sprintf "\t%f\t%s\n" tick label)) "ticks\tlabels\n" ticks labels
                 str
 
@@ -755,7 +758,13 @@ module Chart =
                 chartNode |> addDiv titleNode
             else
                 chartNode
-
+        
+        let chartNode =
+            if chart.IsTooltipPlotCoordsEnabled then
+                chartNode
+            else
+                chartNode |> addAttribute "data-idd-suppress-tooltip-coords" "true"
+          
         let getXYDataDom xSeries ySeries =                
                 sprintf "x float64.1D %s\ny float64.1D %s" (Utils.encodeFloat64SeqBase64 xSeries) (Utils.encodeFloat64SeqBase64 ySeries)
 
