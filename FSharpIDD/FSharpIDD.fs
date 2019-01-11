@@ -845,7 +845,6 @@ module Chart =
                     BorderColour = h.Colour
                     Shadow = Shadow.WithoutShadow
                 }
-            printfn "Hey hey!"
             bars
             
 
@@ -969,10 +968,8 @@ module Chart =
             resultNode
     
         let histogramToDiv (h: Histogram.Plot) =
-            let histMarkers = histogramToBars h
-            printfn "histMarkers"
-            let div = barchartToDiv histMarkers
-            printfn "histDiv"
+            let histMarkers = histogramToBars h            
+            let div = barchartToDiv histMarkers            
             div
         
         let heatmapToDiv (hm: Heatmap.Plot) =                                    
