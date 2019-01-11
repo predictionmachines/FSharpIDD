@@ -1,9 +1,9 @@
 ﻿module CollectionToHtml
 
-open System.Xml
-open System.IO
 open FSharpIDD.Html
+open WebSharper
 
+[<JavaScript>]
 let toHTML (sampleList: (string*(string list)*string)list) = 
     let testsContainer = addAttribute "class" "test-samples-container" (createDiv())
 

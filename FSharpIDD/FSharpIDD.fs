@@ -8,21 +8,22 @@ module Conversions =
     let inline byte x = byte x
 
 module Utils =
+
     [<Inline "Math.floor(new Date().valueOf() * Math.random()).toString()">]
     let getUniqueId(): string = 
         System.Guid.NewGuid().ToString()
-    
-    [<Inline "throw \"not implemented\"">]
+            
+    [<Inline "btoa((new Uint8Array((Float64Array.from($0)).buffer)).reduce(function (data, byte) { return data + String.fromCharCode(byte)}, ''))">]
     let encodeFloat64SeqBase64 data =
         let bytes = data |> Seq.collect (fun (elem:float) -> System.BitConverter.GetBytes(elem)) |> Array.ofSeq
         let base64str = System.Convert.ToBase64String bytes
         base64str
 
+    [<Inline "throw \"not NotImplementedException\"">]
     let encodeStringSeqBase64 (data:string) =
         let bytes = data |> System.Text.Encoding.ASCII.GetBytes
         let base64str = System.Convert.ToBase64String bytes
         base64str
-
 
 [<JavaScript>]
 module Plots =        
@@ -833,17 +834,18 @@ module Chart =
                 <| Utils.encodeFloat64SeqBase64 flattenedData
 
         let histogramToBars (h:Histogram.Plot) =
-            let hist = Histogram.buildHistogram h.Samples h.BinCount
+            let hist = Histogram.buildHistogram h.Samples h.BinCount            
             let bars: Bars.Plot = 
                 {
                     Name = h.Name
-                    BarCenters = hist.BinCentres
-                    BarHeights = hist.BinCounters |> Seq.map float
+                    BarCenters = hist.BinCentres |> Array.ofList
+                    BarHeights = hist.BinCounters |> Seq.map float |> Array.ofSeq // leaving Seq type here causes WebSharper to produce empty data code
                     BarWidth = hist.BinWidth
                     FillColour = h.Colour
                     BorderColour = h.Colour
                     Shadow = Shadow.WithoutShadow
                 }
+            printfn "Hey hey!"
             bars
             
 
@@ -967,7 +969,11 @@ module Chart =
             resultNode
     
         let histogramToDiv (h: Histogram.Plot) =
-            histogramToBars h |> barchartToDiv
+            let histMarkers = histogramToBars h
+            printfn "histMarkers"
+            let div = barchartToDiv histMarkers
+            printfn "histDiv"
+            div
         
         let heatmapToDiv (hm: Heatmap.Plot) =                                    
             let styleEntries = [ sprintf "opacity: %f" hm.Opacity ]

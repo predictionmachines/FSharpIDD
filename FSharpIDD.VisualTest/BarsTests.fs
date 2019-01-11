@@ -1,4 +1,5 @@
-﻿module BarsTest
+﻿[<WebSharper.JavaScript>]
+module BarsTest
 
 open FSharpIDD.Plots
 open FSharpIDD.Chart

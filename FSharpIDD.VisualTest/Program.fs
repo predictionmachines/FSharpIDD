@@ -1,6 +1,7 @@
-﻿open System.IO
-open System.Diagnostics
+﻿module Tests
+
 open FSharpIDD
+open WebSharper
 open CollectionToHtml
 open FSharpIDD.Plots
 open FSharpIDD.Chart
@@ -14,12 +15,13 @@ open BarsTest
 open HistogramTests
 open HeatMapTests
 
-[<EntryPoint>]
-let main argv =
+#if JAVASCRIPT
+[<assembly: WebSharper.JavaScriptExport("FSharpIDD.WS")>]
+do ()
+#endif
 
-    let template = File.ReadAllText "template.html"
-
-
+[<JavaScript>]
+let getTestText() =
     // Empty chart
     let emptyChartStr = Empty |> Chart.setSize 300 200
     let emptyChartTest =
@@ -206,11 +208,20 @@ let main argv =
 
     let generatedDiv = tests |> CollectionToHtml.toHTML 
     
+    generatedDiv
+
+#if JAVASCRIPT
+#else
+[<EntryPoint>]
+let main argv =
+    let template = System.IO.File.ReadAllText "template.html"    
+    let generatedDiv = getTestText()
     let html = template.Replace("<%PLACEHOLDER%>", generatedDiv)
     printfn "%s" generatedDiv
-    let writer = File.CreateText("visualTests.html")
+    let writer = System.IO.File.CreateText("visualTests.html")
     writer.Write(html)
     writer.Close()
-    Process.Start("visualTests.html") |> ignore
+    System.Diagnostics.Process.Start("visualTests.html") |> ignore
 
     0
+#endif

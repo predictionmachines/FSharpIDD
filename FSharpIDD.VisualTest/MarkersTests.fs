@@ -1,4 +1,5 @@
-﻿module MarkersTests
+﻿[<WebSharper.JavaScript>]
+module MarkersTests
 
 open FSharpIDD.Plots
 open FSharpIDD.Chart

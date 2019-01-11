@@ -1,4 +1,5 @@
-﻿module HeatMapTests
+﻿[<WebSharper.JavaScript>]
+module HeatMapTests
 
 open FSharpIDD.Plots
 open FSharpIDD.Chart

@@ -1,4 +1,5 @@
-﻿module PolylineTests
+﻿[<WebSharper.JavaScript>]
+module PolylineTests
 
 open FSharpIDD.Plots
 open FSharpIDD.Chart
