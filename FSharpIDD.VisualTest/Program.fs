@@ -31,7 +31,22 @@ let getTestText() =
             "Chart has axes, grid lines. Is 300px wide, 200px tall"
         ],
         emptyChartStr
+    
+    let scientificNotationTest =
+        "Scientific notation on numeric axis",
+        [
+            "Empty |> Chart.setVisibleRegion (VisibleRegion.Explicit(-4.0e5,-1e3,6.0e5,3e3))"
+            "scientific notation in axis tick labels"
+        ],
+        Empty |> Chart.setVisibleRegion (VisibleRegion.Explicit(-4.0e5,-1e3,6.0e5,3e3))
 
+    let scientificNotationTest2 =
+        "Scientific notation on numeric axis",
+        [
+            "Empty |> Chart.setVisibleRegion (VisibleRegion.Explicit(-4.0e-5,-1e-3,6.0e-5,3e-3))"
+            "scientific notation in axis tick labels"
+        ],
+        Empty |> Chart.setVisibleRegion (VisibleRegion.Explicit(-4.0e-5,-1e-3,6.0e-5,3e-3))
 
     // Legend enabling
     let basicPolylinePlot : Polyline.Plot = createPolyline Xseries Yseries
@@ -147,10 +162,12 @@ let getTestText() =
             "Polyline with a horizontal axis, where labels are tilted"
         ],
         labelledAxisStr
-
+    
     let tests = 
         [
             emptyChartTest
+            scientificNotationTest
+            scientificNotationTest2
             //polyline
             presetPolylineTest
             setNonePolylineTest

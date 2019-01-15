@@ -542,7 +542,7 @@ module Chart =
     /// The axis is disabled (not visible)
     |   Hidden
     /// Numeric axis of automatically calculated and placed numerical ticks with values
-    |   Numeric
+    |   Numeric of ScientificNotationEnabled:bool
     /// Labelled axis. Uses array with string labels(lables[]) and array of numerical values (ticks[]), where these labels will be placed. Also has an angle parameter
     |   Labelled of LabelledAxisRecord
     
@@ -619,8 +619,8 @@ module Chart =
         Title = null // null means not set
         Xlabel = null // null means not set
         Ylabel = null // null means not set
-        Xaxis = Axis.Numeric
-        Yaxis = Axis.Numeric
+        Xaxis = Axis.Numeric true
+        Yaxis = Axis.Numeric true
         GridLines = DefaultGridLines
         IsLegendEnabled = Automatic
         IsNavigationEnabled = true
@@ -715,14 +715,16 @@ module Chart =
         let chartNode,yAxisID = 
             match chart.Yaxis with
             |   Axis.Hidden -> chartNode, Option.None
-            |   Axis.Numeric ->
+            |   Axis.Numeric(scientificNotationEnabled) ->
                 let id = Utils.getUniqueId()
                 let axisNode =                    
                     createDiv()
                     |> addAttribute "id" id
                     |> addAttribute "data-idd-axis" "numeric"
                     |> addAttribute "data-idd-placement" "left"
-                    |> addAttribute "style" "position: relative;"                    
+                    |> addAttribute "style" "position: relative;"
+                let axisNode = if scientificNotationEnabled then addAttribute "data-idd-scientific-notation" "true" axisNode else axisNode
+                
                 (chartNode |> addDiv axisNode),(Some id)
             |   Axis.Labelled labelledAxisRecord ->
                 let (ticks, labels, angle) = labelledAxisRecord.Ticks, labelledAxisRecord.Labels, labelledAxisRecord.Angle
@@ -755,14 +757,15 @@ module Chart =
         let chartNode,xAxisID = 
             match chart.Xaxis with
             |   Axis.Hidden -> chartNode, Option.None
-            |   Axis.Numeric ->
+            |   Axis.Numeric(scientificNotationEnabled) ->
                 let id = Utils.getUniqueId()
                 let axisNode =                    
                     createDiv()
                     |> addAttribute "id" id
                     |> addAttribute "data-idd-axis" "numeric"
                     |> addAttribute "data-idd-placement" "bottom"
-                    |> addAttribute "style" "position: relative;"                    
+                    |> addAttribute "style" "position: relative;"    
+                let axisNode = if scientificNotationEnabled then addAttribute "data-idd-scientific-notation" "true" axisNode else axisNode
                 (chartNode |> addDiv axisNode),(Some id)  
             |   Axis.Labelled labelledAxisRecord ->
                 let (ticks, labels, angle) = labelledAxisRecord.Ticks, labelledAxisRecord.Labels, labelledAxisRecord.Angle
