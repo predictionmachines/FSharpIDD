@@ -1,7 +1,10 @@
 # F# API for Interactive Data Display
 
-![Nuget version shield](https://img.shields.io/nuget/v/FSharpIDD.svg)
-![Nuget downloads shield](https://img.shields.io/nuget/dt/FSharpIDD.svg)
+
+| Platform | Version | Downloads |
+| -- | -- | -- |
+| .NET | [![Nuget version shield](https://img.shields.io/nuget/v/FSharpIDD.svg)](https://www.nuget.org/packages/FSharpIDD/) | [![Nuget downloads shield](https://img.shields.io/nuget/dt/FSharpIDD.svg)](https://www.nuget.org/packages/FSharpIDD/) |
+| Web Sharper | [![Nuget version shield](https://img.shields.io/nuget/v/FSharpIDD.WS.svg)](https://www.nuget.org/packages/FSharpIDD.WS/) | [![Nuget downloads shield](https://img.shields.io/nuget/dt/FSharpIDD.WS.svg)](https://www.nuget.org/packages/FSharpIDD.WS/) |
 
 Provides a way to compose a chart in F# and easily get embeddable HTML presenting this chart.
 
