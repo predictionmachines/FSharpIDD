@@ -14,7 +14,7 @@ module Utils =
         System.Guid.NewGuid().ToString()
             
     [<Inline "btoa((new Uint8Array((Float64Array.from($0)).buffer)).reduce(function (data, byte) { return data + String.fromCharCode(byte)}, ''))">]
-    let encodeFloat64SeqBase64 data =
+    let encodeFloat64ArrayBase64 (data:float array) =
         let bytes = data |> Seq.collect (fun (elem:float) -> System.BitConverter.GetBytes(elem)) |> Array.ofSeq
         let base64str = System.Convert.ToBase64String bytes
         base64str
@@ -818,7 +818,7 @@ module Chart =
                 chartNode |> addAttribute "data-idd-suppress-tooltip-coords" "true"
           
         let getXYDataDom xSeries ySeries =                
-                sprintf "x float64.1D %s\ny float64.1D %s" (Utils.encodeFloat64SeqBase64 xSeries) (Utils.encodeFloat64SeqBase64 ySeries)
+                sprintf "x float64.1D %s\ny float64.1D %s" (Utils.encodeFloat64ArrayBase64 (Array.ofSeq xSeries)) (Utils.encodeFloat64ArrayBase64 (Array.ofSeq ySeries))
 
         let getHeatMapDataDom (xSeries:float array) (ySeries: float array) (valArray: float [,]) =
             let outerDimLen,innerDimLen = Array2D.length1 valArray, Array2D.length2 valArray            
@@ -831,10 +831,10 @@ module Chart =
                 }
                 
             sprintf "x float64.1D %s\ny float64.1D %s\nvalues float64.2D %i %s"
-                <| Utils.encodeFloat64SeqBase64 xSeries
-                <| Utils.encodeFloat64SeqBase64 ySeries
+                <| Utils.encodeFloat64ArrayBase64 (Array.ofSeq xSeries)
+                <| Utils.encodeFloat64ArrayBase64 (Array.ofSeq ySeries)
                 <| innerDimLen
-                <| Utils.encodeFloat64SeqBase64 flattenedData
+                <| Utils.encodeFloat64ArrayBase64 (Array.ofSeq flattenedData)
 
         let histogramToBars (h:Histogram.Plot) =
             let hist = Histogram.buildHistogram h.Samples h.BinCount            
