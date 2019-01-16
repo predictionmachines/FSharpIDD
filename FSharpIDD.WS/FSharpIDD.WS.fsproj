@@ -65,6 +65,7 @@
     <Compile Include="..\FSharpIDD\FSharpIDD.fs">
       <Link>FSharpIDD.fs</Link>
     </Compile>
+    <None Include="FSharpIDD.WS.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
