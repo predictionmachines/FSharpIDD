@@ -20,6 +20,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharpIDD.VisualTest", "FSh
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharpIDD.VisualTest.WS", "FSharpIDD.VisualTest.WS\FSharpIDD.VisualTest.WS.fsproj", "{67596CF5-3E61-4055-910A-B06B05A0A60C}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Demo.Subplots.Net", "Demo.Subplots.Net\Demo.Subplots.Net.fsproj", "{37088A36-7DDD-46CB-A018-589491D4676C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{67596CF5-3E61-4055-910A-B06B05A0A60C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67596CF5-3E61-4055-910A-B06B05A0A60C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67596CF5-3E61-4055-910A-B06B05A0A60C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37088A36-7DDD-46CB-A018-589491D4676C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37088A36-7DDD-46CB-A018-589491D4676C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37088A36-7DDD-46CB-A018-589491D4676C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37088A36-7DDD-46CB-A018-589491D4676C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -46,7 +46,7 @@ let main argv =
         |> Chart.setYlabel "Parameter value"
     
     // getting HTML that represents the chart
-    let generatedChart = chart |> toHTML
+    let generatedChart = chart |> HTML.ofChart
 
     let template = File.ReadAllText "template.html"
 

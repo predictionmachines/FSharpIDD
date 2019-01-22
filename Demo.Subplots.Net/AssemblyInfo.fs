@@ -1,4 +1,4 @@
-﻿namespace Demo.AssemblyInfo
+﻿namespace Demo.Subplots.Net.AssemblyInfo
 
 open System.Reflection
 open System.Runtime.CompilerServices
@@ -7,12 +7,12 @@ open System.Runtime.InteropServices
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[<assembly: AssemblyTitle("FSharpIDD.WS")>]
+[<assembly: AssemblyTitle("Demo.Subplots.Net")>]
 [<assembly: AssemblyDescription("")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("")>]
-[<assembly: AssemblyProduct("FSharpIDD.WS")>]
-[<assembly: AssemblyCopyright("Copyright ©  2018")>]
+[<assembly: AssemblyProduct("Demo.Subplots.Net")>]
+[<assembly: AssemblyCopyright("Copyright ©  2019")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
 
@@ -22,7 +22,7 @@ open System.Runtime.InteropServices
 [<assembly: ComVisible(false)>]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[<assembly: Guid("91cd065c-1e0b-4081-884c-61f333532d18")>]
+[<assembly: Guid("37088a36-7ddd-46cb-a018-589491d4676c")>]
 
 // Version information for an assembly consists of the following four values:
 //

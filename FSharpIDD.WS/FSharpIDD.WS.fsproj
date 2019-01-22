@@ -53,19 +53,43 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <None Include="FSharpIDD.WS.nuspec" />
     <Compile Include="..\FSharpIDD\Colour.fs">
       <Link>Colour.fs</Link>
     </Compile>
-    <Compile Include="..\FSharpIDD\Html.fs">
-      <Link>Html.fs</Link>
+    <Compile Include="..\FSharpIDD\Dom.fs">
+      <Link>Dom.fs</Link>
+    </Compile>
+    <Compile Include="..\FSharpIDD\Plots.fs">
+      <Link>Plots.fs</Link>
+    </Compile>
+    <Compile Include="..\FSharpIDD\Polyline.fs">
+      <Link>Polyline.fs</Link>
+    </Compile>
+    <Compile Include="..\FSharpIDD\Markers.fs">
+      <Link>Markers.fs</Link>
+    </Compile>
+    <Compile Include="..\FSharpIDD\Bars.fs">
+      <Link>Bars.fs</Link>
     </Compile>
     <Compile Include="..\FSharpIDD\Histogram.fs">
       <Link>Histogram.fs</Link>
     </Compile>
-    <Compile Include="..\FSharpIDD\FSharpIDD.fs">
-      <Link>FSharpIDD.fs</Link>
+    <Compile Include="..\FSharpIDD\Heatmap.fs">
+      <Link>Heatmap.fs</Link>
     </Compile>
-    <None Include="FSharpIDD.WS.nuspec" />
+    <Compile Include="..\FSharpIDD\Chart.fs">
+      <Link>Chart.fs</Link>
+    </Compile>
+    <Compile Include="..\FSharpIDD\HtmlConverters.fs">
+      <Link>HtmlConverters.fs</Link>
+    </Compile>
+    <Compile Include="..\FSharpIDD\Subplots.fs">
+      <Link>Subplots.fs</Link>
+    </Compile>
+    <Compile Include="..\FSharpIDD\Html.fs">
+      <Link>Html.fs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

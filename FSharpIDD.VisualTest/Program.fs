@@ -221,7 +221,7 @@ let getTestText() =
             corrMapTest
         ]
 
-    let tests = List.mapi (fun i elem -> let testName, descrList, chartStr = elem in (sprintf "%d. %s" (i+1) testName), descrList, (chartStr |> toHTML)) tests
+    let tests = List.mapi (fun i elem -> let testName, descrList, chart = elem in (sprintf "%d. %s" (i+1) testName), descrList, HTML.ofChart chart) tests
 
     let generatedDiv = tests |> CollectionToHtml.toHTML 
     

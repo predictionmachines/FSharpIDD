@@ -1,6 +1,6 @@
 ﻿module CollectionToHtml
 
-open FSharpIDD.Html
+open FSharpIDD.DOM
 open WebSharper
 
 [<JavaScript>]
@@ -24,11 +24,6 @@ let toHTML (sampleList: (string*(string list)*string)list) =
         
         addDiv sampleNode oldNode
 
-    let testsContainer = sampleList |> Seq.fold arrangeSample testsContainer
-
-    let revertedTests = {
-        testsContainer with
-            Children = List.rev testsContainer.Children
-        }
+    let testsContainer = sampleList |> Seq.fold arrangeSample testsContainer    
     
-    divToStr (addDiv revertedTests (createDiv()))
+    Div (addDiv testsContainer (createDiv())) |> toString
