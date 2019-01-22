@@ -11,6 +11,7 @@
     <RepositoryUrl>https://github.com/predictionmachines/FSharpIDD.git</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/predictionmachines/FSharpIDD/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/predictionmachines/FSharpIDD</PackageProjectUrl>
+    <Description>F# API for Interactive Data Display</Description>
   </PropertyGroup>
   <!--<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
     <DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
@@ -24,6 +25,7 @@
     <Compile Include="Html.fs" />
     <Compile Include="Histogram.fs" />
     <Compile Include="FSharpIDD.fs" />
+    <Compile Include="PlotGrid.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.3.4" />

@@ -91,5 +91,5 @@ module Html=
             if List.length div.Attributes = 0 then ""
             else
                 " "+System.String.Join(" ", div.Attributes |> Seq.map attributeToStr)
-        let contents = System.String.Join("\n", div.Children |> Seq.map nodeToStr)
+        let contents = System.String.Join("\n", div.Children |> Seq.rev |> Seq.map nodeToStr)
         sprintf "<div%s>%s</div>" attributesStr contents

@@ -671,7 +671,7 @@ module Chart =
 
     open Html
 
-    let toHTML (chart:Chart) =
+    let toHtmlStructure (chart:Chart) =
         let chartNode =
             let addVisibleRegionAttribute = 
                 match chart.VisibleRegion with
@@ -682,21 +682,7 @@ module Chart =
             |> addAttribute "data-idd-plot" "figure" 
             |> addAttribute "style" (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
             |> addVisibleRegionAttribute        
-                
-        let chartNode = 
-            if chart.Ylabel <> null then
-                let containerNode =
-                    let labelNode =
-                        createDiv()
-                        |> addAttribute "class" "idd-verticalTitle-inner"
-                        |> addText chart.Ylabel
-                    createDiv()
-                    |> addAttribute "class" "idd-verticalTitle"
-                    |> addAttribute "data-idd-placement" "left"
-                    |> addDiv labelNode                                        
-                chartNode |> addDiv containerNode
-            else
-                chartNode
+                      
             
 
         let getDataDomWithTicksLabels ticks labels =
@@ -744,13 +730,17 @@ module Chart =
                 (chartNode |> addDiv axisNode),(Some id)
         
         let chartNode = 
-            if chart.Xlabel <> null then
-                let labelNode =
+            if chart.Ylabel <> null then
+                let containerNode =
+                    let labelNode =
+                        createDiv()
+                        |> addAttribute "class" "idd-verticalTitle-inner"
+                        |> addText chart.Ylabel
                     createDiv()
-                    |> addAttribute "class" "idd-horizontalTitle"
-                    |> addAttribute "data-idd-placement" "bottom"
-                    |> addText chart.Xlabel
-                chartNode |> addDiv labelNode
+                    |> addAttribute "class" "idd-verticalTitle"
+                    |> addAttribute "data-idd-placement" "left"
+                    |> addDiv labelNode                                        
+                chartNode |> addDiv containerNode
             else
                 chartNode
 
@@ -781,7 +771,18 @@ module Chart =
                     if (labelledAxisRecord.Angle = 0.0)
                     then axisNode
                     else (axisNode |> addAttribute "data-idd-style" ("rotate: true; rotateAngle: " + (sprintf "%f;" labelledAxisRecord.Angle)))
-                (chartNode |> addDiv axisNode),(Some id)             
+                (chartNode |> addDiv axisNode),(Some id)
+
+        let chartNode = 
+            if chart.Xlabel <> null then
+                let labelNode =
+                    createDiv()
+                    |> addAttribute "class" "idd-horizontalTitle"
+                    |> addAttribute "data-idd-placement" "bottom"
+                    |> addText chart.Xlabel
+                chartNode |> addDiv labelNode
+            else
+                chartNode                     
         
         let effectiveLegendvisibility =
             match chart.IsLegendEnabled with
@@ -1035,6 +1036,6 @@ module Chart =
                 chartNode |> addDiv gridNode
             |   GridLines.Disabled -> chartNode
 
-        divToStr chartNode
-
-    
+        chartNode
+    let toHTML chart =
+        toHtmlStructure chart |> divToStr
