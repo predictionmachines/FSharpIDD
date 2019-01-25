@@ -25,7 +25,7 @@
     <Compile Include="Html.fs" />
     <Compile Include="Histogram.fs" />
     <Compile Include="FSharpIDD.fs" />
-    <Compile Include="PlotGrid.fs" />
+    <Compile Include="Subplots.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.3.4" />

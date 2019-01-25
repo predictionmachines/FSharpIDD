@@ -14,13 +14,19 @@ module Html=
         Value: HtmlString
     }
 
-    type Node =
+    type TableCell = TD of Node
+    and TableRow = Cells of TableCell list
+    and Table = Rows of TableRow list
+    and Node =
         |   Text of HtmlString
         |   Div of Div
+        |   Table of Table
+        |   Empty
     and Div = {
             Attributes: Attribute list
             Children:  Node list
         }
+    
 
     let internal guardAttrName (str:string) : HtmlString = 
         let validChars = [|'-';|]
@@ -40,9 +46,7 @@ module Html=
         let str = str.Replace(">","&gt;")
         let str = str.Replace("<","&lt;")
         Valid str
-
         
-
     let createDiv() =
         {
             Attributes = []
@@ -69,6 +73,12 @@ module Html=
                 Children = (Div child)::parent.Children
         }
 
+    let addTable table parent =
+        {
+            parent with
+                Children = (Table table)::parent.Children
+        }
+    
     let addAttribute key value div =    
         {
             div with
@@ -81,12 +91,28 @@ module Html=
                 match attr.Key,attr.Value with
                 | Valid key,Valid value -> key,value
             sprintf "%s=\"%s\"" key value
-        let nodeToStr node = 
+        let rec nodeToStr node = 
             match node with
             |   Text htmlText ->
                 match htmlText with
                 | Valid text -> text
             |   Div div -> divToStr div
+            |   Table rows ->
+                match rows with
+                |   Rows rowsList ->
+                    let rowsList = Seq.rev rowsList
+                    let rowToStr row =
+                        match row with
+                        |   Cells cells ->
+                            let cells = Seq.rev cells
+                            let cellToStr cell =
+                                match cell with
+                                |   TD cellContent ->
+                                    sprintf "<td>%s</td>" (nodeToStr cellContent)
+                            sprintf "<tr>%s</tr>" (System.String.Join("", cells |> Seq.map cellToStr))
+                    System.String.Join("\n",rowsList |> Seq.map rowToStr)
+            |   Empty -> ""
+
         let attributesStr = 
             if List.length div.Attributes = 0 then ""
             else
