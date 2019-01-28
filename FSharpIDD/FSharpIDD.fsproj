@@ -25,6 +25,7 @@
     <Compile Include="Html.fs" />
     <Compile Include="Histogram.fs" />
     <Compile Include="FSharpIDD.fs" />
+    <Compile Include="HtmlConverters.fs" />
     <Compile Include="Subplots.fs" />
   </ItemGroup>
   <ItemGroup>

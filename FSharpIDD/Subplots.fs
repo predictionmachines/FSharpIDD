@@ -39,7 +39,7 @@ let chartToBareChart (chart:Chart.Chart) : BareChart=
 
 type Slot =
     |   Plot of BareChart
-    |   Axis of Chart.Axis * AxisPlacement * string // axis , axis placement (left, bottom, ...) and title
+    |   Axis of Chart.Axis * AxisPlacement * title:string
     |   PlotTitle of string
     |   Empty
 
@@ -58,10 +58,10 @@ let chartsGridToSlotGrid charts =
             if chart.Title <> null then slotGrid.[rowIdx*3, colIdx*3 + 1] <- PlotTitle(chart.Title)
 
             // left slot may contain left axis
-            slotGrid.[rowIdx*3 + 1, colIdx*3] <- Axis(chart.Xaxis, Left, chart.Xlabel)
+            slotGrid.[rowIdx*3 + 1, colIdx*3] <- Axis(chart.Yaxis, Left, chart.Ylabel)
 
             //bottom slot mat contain bottom axis
-            slotGrid.[rowIdx*3 + 1, colIdx*3 + 2] <- Axis(chart.Yaxis, Bottom, chart.Ylabel)
+            slotGrid.[rowIdx*3 + 2, colIdx*3 + 1] <- Axis(chart.Xaxis, Bottom, chart.Xlabel)
             )
         )
     slotGrid
@@ -71,16 +71,55 @@ let slotToHtmlStructure (slot:Slot) : Html.Node =
     |   Empty -> Html.Empty
     |   Axis(axis,placement,title) ->        
         let div = Html.createDiv()
-        let div,_ = Chart.axisToHtmlStructure axis placement div
+        let axisNode = HtmlConverters.axisToHtmlStructure axis placement
+        let div =
+            match axisNode with
+            |   Some(axis,_) ->
+                let axis = 
+                    match placement with
+                    |   Left| Right -> axis |> Html.addAttribute "style" "height: 100px;"
+                    |   Top | Bottom -> axis |> Html.addAttribute "style" "width: 200px;"
+                Html.addDiv axis div
+            |   None -> div
         let div =
             if title <> null then
-                horAxisLabelToHtmlStructure title placement div
+                match placement with
+                |   Left| Right -> vertAxisLabelToHtmlStructue title placement div 
+                |   Top | Bottom -> horAxisLabelToHtmlStructure title placement div 
             else
                 div
-        div
-    |   Plot(bareChart) ->
+        Div div
+    |   Plot(bareChart) ->       
+        let div =
+            Html.createDiv()
+            |> Html.addAttribute "data-idd-plot" "plot"
+            |> Html.addAttribute "style" "height: 100px; width: 200px;"
+            |> Html.addAttribute "data-idd-padding" "1"
 
+        let plotTrap =
+            let plotDiv = createDiv()
+            Html.addAttribute "data-idd-plot" "subplots-trap" plotDiv
 
+        let div = Html.addDiv plotTrap div
+
+        let div = HtmlConverters.gridLinesToHtmlStructure bareChart.GridLines None None div
+        Div (Seq.fold (fun state t -> let plotDiv = HtmlConverters.plotToDiv t in Html.addDiv plotDiv state) div bareChart.Plots)
+    |   PlotTitle title ->
+        let div =
+            Html.createDiv()
+            |> Html.addText title
+            |> Html.addAttribute "class" "title"
+        Div div
+
+let slotGridToHtmlStructure (slots: Slot[,]) =
+    let rows = Array2D.length1 slots
+    let cols = Array2D.length2 slots
+
+    let getRow i =
+        Cells(seq { 0 .. (cols-1)} |> Seq.map (fun col -> TD(slots.[i,col] |> slotToHtmlStructure)) |> Seq.rev |> List.ofSeq)
+    let rows = 
+        Rows(seq { 0 .. (rows - 1) } |> Seq.map getRow |> Seq.rev |> List.ofSeq)
+    Html.Table rows
 
 (*
 let toHtmlStructure subplots =

@@ -84,14 +84,8 @@ module Html=
             div with
                 Attributes = {Key = guardAttrName key; Value = guardAttrValue value} :: div.Attributes
         }
-
-    let rec divToStr div =
-        let attributeToStr attr = 
-            let key,value = 
-                match attr.Key,attr.Value with
-                | Valid key,Valid value -> key,value
-            sprintf "%s=\"%s\"" key value
-        let rec nodeToStr node = 
+    
+    let rec nodeToStr node = 
             match node with
             |   Text htmlText ->
                 match htmlText with
@@ -110,8 +104,14 @@ module Html=
                                 |   TD cellContent ->
                                     sprintf "<td>%s</td>" (nodeToStr cellContent)
                             sprintf "<tr>%s</tr>" (System.String.Join("", cells |> Seq.map cellToStr))
-                    System.String.Join("\n",rowsList |> Seq.map rowToStr)
+                    sprintf "<table>%s</table>" (System.String.Join("\n",rowsList |> Seq.map rowToStr))
             |   Empty -> ""
+    and divToStr div =
+        let attributeToStr attr = 
+            let key,value = 
+                match attr.Key,attr.Value with
+                | Valid key,Valid value -> key,value
+            sprintf "%s=\"%s\"" key value        
 
         let attributesStr = 
             if List.length div.Attributes = 0 then ""

@@ -2,32 +2,50 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=10; IE=Edge" />
-    <title>IDD F# demo</title>    
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.20/dist/idd.css" />    
+    <title>IDD F# demo</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.20/dist/idd.css" />
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/3.1.2/rx.lite.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
     <!--<script src="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.20/dist/idd.js"></script>-->
     <script src="idd.js"></script>
+    <style>
+        div.title {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        table {
+            border-spacing: 1px;
+        }
+        td, tr {
+            margin: 0;
+            padding: 0;
+        }
 
-    <script type="text/javascript"> 
+        div.idd-plot-master {
+            border: 1px solid gray;
+        }
+    </style>
+    <script type="text/javascript">
         $(document).ready(function () {
-            $(".fsharp-idd").each(function (index) {
-                InteractiveDataDisplay.asPlot($(this));
-            })
+            //$(".fsharp-idd").each(function (index) {
+            //    InteractiveDataDisplay.asPlot($(this));
+            //})
+            var subplots = InteractiveDataDisplay.SubPlots(document.getElementsByTagName('TABLE')[0])
             // visible rect bindings
-            for (var row = 0; row < 20; row++) {
-                for (var col = 1; col < 6; col++) {
-                    InteractiveDataDisplay.Binding.bindPlots(InteractiveDataDisplay.asPlot('plot-' + row + '-' + col), InteractiveDataDisplay.asPlot('plot-' + row + '-0'), "v");
-                    InteractiveDataDisplay.Binding.bindPlots(InteractiveDataDisplay.asPlot('plot-' + row + '-' + col), InteractiveDataDisplay.asPlot('plot-' + row + '-0'), "h");
-                }
-                if (row > 0) {
-                    InteractiveDataDisplay.Binding.bindPlots(InteractiveDataDisplay.asPlot('plot-' + row + '-0'), InteractiveDataDisplay.asPlot('plot-' + (row-1) + '-0'), "v");
-                    InteractiveDataDisplay.Binding.bindPlots(InteractiveDataDisplay.asPlot('plot-' + row + '-0'), InteractiveDataDisplay.asPlot('plot-' + (row-1) + '-0'), "h");
-                }
-            }
+            //for (var row = 0; row < 20; row++) {
+            //    for (var col = 1; col < 6; col++) {
+            //        InteractiveDataDisplay.Binding.bindPlots(InteractiveDataDisplay.asPlot('plot-' + row + '-' + col), InteractiveDataDisplay.asPlot('plot-' + row + '-0'), "v");
+            //        InteractiveDataDisplay.Binding.bindPlots(InteractiveDataDisplay.asPlot('plot-' + row + '-' + col), InteractiveDataDisplay.asPlot('plot-' + row + '-0'), "h");
+            //    }
+            //    if (row > 0) {
+            //        InteractiveDataDisplay.Binding.bindPlots(InteractiveDataDisplay.asPlot('plot-' + row + '-0'), InteractiveDataDisplay.asPlot('plot-' + (row-1) + '-0'), "v");
+            //        InteractiveDataDisplay.Binding.bindPlots(InteractiveDataDisplay.asPlot('plot-' + row + '-0'), InteractiveDataDisplay.asPlot('plot-' + (row-1) + '-0'), "h");
+            //    }
+            //}
         });
     </script>
 </head>
