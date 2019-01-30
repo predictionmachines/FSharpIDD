@@ -74,8 +74,8 @@ let main argv =
         |> Chart.addPolyline polyline2
         |> Chart.addMarkers markers1
         |> Chart.addMarkers markers2
-        //|> Chart.setXaxis Axis.Hidden
-        //|> Chart.setYaxis Axis.Hidden
+        |> Chart.setXaxis Axis.Hidden
+        |> Chart.setYaxis Axis.Hidden
         |> Chart.setNavigationEnabled true
 
     let comparisondiv = HtmlConverters.toHtmlStructure comparisionChart

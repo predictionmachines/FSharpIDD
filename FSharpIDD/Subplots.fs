@@ -10,7 +10,7 @@ type Subplots =
         Title: string
         Charts: Chart.Chart[,]
         Width: int 
-        /// The height of the chart in pixels
+        /// The height of each chart in pixels
         Height: int
     }
 
