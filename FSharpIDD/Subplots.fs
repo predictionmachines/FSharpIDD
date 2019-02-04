@@ -7,19 +7,31 @@ open HtmlConverters
 
 type Subplots = 
     {
+        /// Common title
         Title: string
-        Charts: Chart.Chart[,]
-        Width: int 
+        /// 0-based rowIdx,colIdx -> chart
+        /// The absence of the index pair indicates the blank slot
+        Charts: Map<(int*int),Chart>
+        /// The width of each chart in pixels
+        PlotWidth: int 
         /// The height of each chart in pixels
-        Height: int
+        PlotHeight: int
+        /// The number of rows in subplots
+        RowsCount: int
+        /// The number of columns in subplots
+        ColumnsCount: int
+        /// Which plot to use for externally placed legend
+        /// None indicates that external legend is not
+        ExternalLegendSource: (int*int*Placement) option                
     }
 
 let createPlotGrid nrow ncol initializer =    
     {
         Title= "Test plot grid"
         Charts = Array2D.init nrow ncol initializer
-        /// The width of the chart in pixels
+        /// The width of each subplots
         Width = 300
+        /// The hight of each subplots
         Height = 200
     }
 

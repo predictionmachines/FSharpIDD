@@ -4,7 +4,7 @@ open FSharpIDD.Chart
 open FSharpIDD.Plots
 open Html
     
-type AxisPlacement =
+type Placement =
     |   Bottom
     |   Top
     |   Left
