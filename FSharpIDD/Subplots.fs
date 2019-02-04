@@ -1,17 +1,18 @@
-﻿module FSharpIDD.PlotGrid
+﻿module FSharpIDD.Subplots
 
 open WebSharper
 open FSharpIDD.Html
 open FSharpIDD.Chart
 open HtmlConverters
 
+/// A collection of charts organized into rectangular grid
 type Subplots = 
     {
         /// Common title
         Title: string
         /// 0-based rowIdx,colIdx -> chart
         /// The absence of the index pair indicates the blank slot
-        Charts: Map<(int*int),Chart>
+        Charts: Map<(int*int),Chart option>
         /// The width of each chart in pixels
         PlotWidth: int 
         /// The height of each chart in pixels
@@ -25,60 +26,86 @@ type Subplots =
         ExternalLegendSource: (int*int*Placement) option                
     }
 
-let createPlotGrid nrow ncol initializer =    
+/// Constructs subplots intance with nrow rows and ncol columns, filling up with the charts provided by initializer function
+let createSubplots nrow ncol initializer =    
+    let colIndices = seq { 0 .. (ncol-1) }
+    let idxPairs = seq { 0 .. (nrow-1) } |> Seq.map (fun rowIdx -> Seq.map (fun colIdx -> (rowIdx,colIdx)) colIndices) |> Seq.concat
+    let folder state elem =
+        let rowIdx,colIdx = elem
+        let chart = initializer rowIdx colIdx
+        Map.add elem chart state    
     {
-        Title= "Test plot grid"
-        Charts = Array2D.init nrow ncol initializer
+        Title = null
+        Charts = Seq.fold folder Map.empty idxPairs
         /// The width of each subplots
-        Width = 300
+        PlotWidth = 300
         /// The hight of each subplots
-        Height = 200
+        PlotHeight = 200
+        RowsCount = nrow
+        ColumnsCount = ncol
+        ExternalLegendSource = None
     }
 
 /// the chart without axis and titles
-type BareChart = {
+/// Used to be placed into the slot of subplots
+type internal BareChart = {
     /// The appearance of grid lines
     GridLines : Chart.GridLines
     /// A collection of plots (polyline, markers, bar charts, etc) to draw
-    Plots: Plots.Plot list    
+    Plots: Plots.Plot list
+    /// Whether the legend (list of plot names and their icons) is visible in the top-right part of the chart
+    IsLegendEnabled: LegendVisibility
+    /// Whether the chart visible area can be navigated with a mouse or touch gestures
+    IsNavigationEnabled: bool
+    /// Whether the plot coordinates of the point under the mouse are shown in the tooltip
+    IsTooltipPlotCoordsEnabled: bool
+    /// Which visible rectangle is displayed by the chart
+    VisibleRegion : VisibleRegion
     }
 
-let chartToBareChart (chart:Chart.Chart) : BareChart=
+
+let internal chartToBareChart (chart:Chart.Chart) : BareChart=
     {
         GridLines = chart.GridLines
         Plots = chart.Plots
+        IsLegendEnabled = chart.IsLegendEnabled
+        IsNavigationEnabled = chart.IsNavigationEnabled
+        IsTooltipPlotCoordsEnabled = chart.IsTooltipPlotCoordsEnabled
+        VisibleRegion = chart.VisibleRegion
     }
 
-type Slot =
+type internal Slot =
     |   Plot of BareChart
-    |   Axis of Chart.Axis * AxisPlacement * title:string
+    |   Axis of Chart.Axis * Placement * title:string
     |   PlotTitle of string
     |   Empty
 
-let chartsGridToSlotGrid charts = 
-    let ncol = Array2D.length2 charts
-    let nrow = Array2D.length1 charts    
+let internal subplotsToSlotGrid subplots = 
+    let nrow,ncol = subplots.RowsCount, subplots.ColumnsCount
     let slotGrid : Slot[,]  = Array2D.create (nrow*3) (ncol*3) Empty
     
     seq { 0..(nrow-1) } |> Seq.iter (fun rowIdx ->
          seq { 0..(ncol-1) } |> Seq.iter (fun colIdx ->
-            let chart : Chart.Chart = downcast charts.GetValue(rowIdx,colIdx)
-            // chart itself
-            slotGrid.[rowIdx*3 + 1, colIdx*3 + 1] <- Plot(chartToBareChart chart)
-            
-            // upper slot can contain Chart title
-            if chart.Title <> null then slotGrid.[rowIdx*3, colIdx*3 + 1] <- PlotTitle(chart.Title)
+              match Map.find (rowIdx,colIdx) subplots.Charts with
+              |   Some chart ->                
+                  // chart itself
+                  slotGrid.[rowIdx*3 + 1, colIdx*3 + 1] <- Plot(chartToBareChart chart)
+              
+                  // upper slot can contain Chart title
+                  if chart.Title <> null then slotGrid.[rowIdx*3, colIdx*3 + 1] <- PlotTitle(chart.Title)
 
-            // left slot may contain left axis
-            slotGrid.[rowIdx*3 + 1, colIdx*3] <- Axis(chart.Yaxis, Left, chart.Ylabel)
+                  // left slot may contain left axis
+                  slotGrid.[rowIdx*3 + 1, colIdx*3] <- Axis(chart.Yaxis, Left, chart.Ylabel)
 
-            //bottom slot mat contain bottom axis
-            slotGrid.[rowIdx*3 + 2, colIdx*3 + 1] <- Axis(chart.Xaxis, Bottom, chart.Xlabel)
-            )
+                  //bottom slot mat contain bottom axis
+                  slotGrid.[rowIdx*3 + 2, colIdx*3 + 1] <- Axis(chart.Xaxis, Bottom, chart.Xlabel)
+              |   None -> ()
+              )
         )
     slotGrid
 
-let slotToHtmlStructure (slot:Slot) : Html.Node =
+/// Width and height is in pixels
+let internal slotToHtmlStructure plotWidth plotHeight (slot:Slot) : Html.Node =
     match slot with
     |   Empty -> Html.Empty
     |   Axis(axis,placement,title) ->        
@@ -89,8 +116,8 @@ let slotToHtmlStructure (slot:Slot) : Html.Node =
             |   Some(axis,_) ->
                 let axis = 
                     match placement with
-                    |   Left| Right -> axis |> Html.addAttribute "style" "height: 100px;"
-                    |   Top | Bottom -> axis |> Html.addAttribute "style" "width: 200px;"
+                    |   Left| Right -> axis |> Html.addAttribute "style" (sprintf "height: %dpx;" plotHeight)
+                    |   Top | Bottom -> axis |> Html.addAttribute "style" (sprintf "width: %dpx;" plotWidth)
                 Html.addDiv axis div
             |   None -> div
         let div =
@@ -105,7 +132,7 @@ let slotToHtmlStructure (slot:Slot) : Html.Node =
         let div =
             Html.createDiv()
             |> Html.addAttribute "data-idd-plot" "plot"
-            |> Html.addAttribute "style" "height: 100px; width: 200px;"
+            |> Html.addAttribute "style" (sprintf "height: %dpx; width: %dpx;" plotHeight plotWidth)
             |> Html.addAttribute "data-idd-padding" "1"
 
         let plotTrap =
@@ -123,61 +150,33 @@ let slotToHtmlStructure (slot:Slot) : Html.Node =
             |> Html.addAttribute "class" "title"
         Div div
 
-let slotGridToHtmlStructure (slots: Slot[,]) =
+let internal slotGridToHtmlStructure plotWidth plotHeight (slots: Slot[,]) =
     let rows = Array2D.length1 slots
     let cols = Array2D.length2 slots
 
     let getRow i =
-        Cells(seq { 0 .. (cols-1)} |> Seq.map (fun col -> TD(slots.[i,col] |> slotToHtmlStructure)) |> Seq.rev |> List.ofSeq)
+        Cells(seq { 0 .. (cols-1)} |> Seq.map (fun col -> TD(slots.[i,col] |> slotToHtmlStructure plotWidth plotHeight)) |> Seq.rev |> List.ofSeq)
     let rows = 
         Rows(seq { 0 .. (rows - 1) } |> Seq.map getRow |> Seq.rev |> List.ofSeq)
     Html.Table rows
 
-(*
-let toHtmlStructure subplots =
-    let root = createDiv()
-    let root = addDiv  (createDiv() |> Html.addText plotGrid.Title) root
-    
-    let charts = subplots.Charts
+/// Coverts the subplots object into corresponding HTML structure
+let subplotsToHtmlStructure subplots =
+    let slots = subplotsToSlotGrid subplots
+    let htmlStructure = slotGridToHtmlStructure subplots.PlotWidth subplots.PlotHeight slots
+    htmlStructure    
 
-    let ncol = Array2D.length2 charts
-    let nrow = Array2D.length1 charts       
-
-    let plotTrap =
-        let plotDiv = createDiv()
-        Html.addAttribute "data-idd-plot" "subplots-trap" plotDiv
-
-    let rec appendChart div charts =
-        let folder state elem =
-            let chart, row, col = elem
-
-            // trap plot injection is required by IDD for subplots operation
-            
-            let iddDiv =
-                Chart.toHtmlStructure chart                
-            let outerDiv =
-                createDiv()
-                |> addAttribute "style" "display: inline-block;"
-                |> addDiv iddDiv
-            Html.addDiv outerDiv state
-        Seq.fold folder div charts
-
-    let getRow idx charts =
-        let rowDiv = createDiv()        
-        let rowDiv = seq { 0..(ncol-1) } |> Seq.map (fun col -> (Array2D.get charts idx col), idx, col) |> appendChart rowDiv        
-        rowDiv
-        
-    let root = Seq.fold (fun state idx -> Html.addDiv (getRow idx charts) state) root (seq{ 0 .. (nrow-1)})
-
-    root
-    *)
-let commonAxes grid =
-    let lastRow = (Array2D.length1 grid.Charts)-1
+let commonAxes subplots =
+    let lastRow = subplots.RowsCount-1
     let replaceAxes r c chart =
-        let chart = if r = lastRow then chart else Chart.setXaxis Chart.Axis.Hidden chart |> Chart.setXlabel null
-        let chart = if c = 0 then chart else Chart.setYaxis Chart.Axis.Hidden chart |> Chart.setYlabel null
-        chart
+        match chart with
+        |   Some chart ->
+            let chart = if r = lastRow then chart else Chart.setXaxis Chart.Axis.Hidden chart |> Chart.setXlabel null
+            let chart = if c = 0 then chart else Chart.setYaxis Chart.Axis.Hidden chart |> Chart.setYlabel null
+            Some chart
+        |   None ->
+            chart
     {
-        grid with
-            Charts = Array2D.init (Array2D.length1 grid.Charts) (Array2D.length2 grid.Charts) (fun r c -> replaceAxes r c grid.Charts.[r,c])
+        subplots with
+            Charts = Map.map (fun key chart-> let r,c = key in replaceAxes r c chart) subplots.Charts
     }
