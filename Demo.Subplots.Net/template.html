@@ -3,7 +3,8 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=10; IE=Edge" />
     <title>IDD F# demo</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.20/dist/idd.css" />
+    <!--<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.20/dist/idd.css" />-->
+    <link rel="stylesheet" type="text/css" href="idd.css" />
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -11,27 +12,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
     <!--<script src="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.20/dist/idd.js"></script>-->
     <script src="idd.js"></script>
-    <style>
-        div.title {
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        table {
-            border-spacing: 1px;
-        }
-        td, tr {
-            margin: 0;
-            padding: 0;
-        }
-
-        div.idd-plot-master {
-            border: 1px solid gray;
-        }
+    <style>        
+        
     </style>
     <script type="text/javascript">
         $(document).ready(function () {
-            var subplots = InteractiveDataDisplay.SubPlots(document.getElementsByTagName('TABLE')[0])            
+            var subplots = InteractiveDataDisplay.SubPlots(document.getElementsByTagName('TABLE')[0])
         });
     </script>
 </head>

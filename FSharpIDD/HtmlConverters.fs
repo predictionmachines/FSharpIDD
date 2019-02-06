@@ -71,7 +71,7 @@ module internal HtmlConverters =
                     else (axisNode |> addAttribute "data-idd-style" ("rotate: true; rotateAngle: " + (sprintf "%f;" labelledAxisRecord.Angle)))
                 Some(axisNode,id)
 
-    let vertAxisLabelToHtmlStructue label placement parent =
+    let vertAxisLabelToHtmlStructue label placement =
         let placementStr = 
             match placement with
             |   Left | Right -> axisPlacementToStr placement
@@ -85,9 +85,9 @@ module internal HtmlConverters =
             |> addAttribute "class" "idd-verticalTitle"
             |> addAttribute "data-idd-placement" placementStr
             |> addDiv labelNode                                        
-        parent |> addDiv containerNode
+        containerNode
     
-    let horAxisLabelToHtmlStructure label placement parent =
+    let horAxisLabelToHtmlStructure label placement =
         let placementStr = 
             match placement with
             |   Left | Right -> failwith "wrong placement"
@@ -97,7 +97,7 @@ module internal HtmlConverters =
                 |> addAttribute "class" "idd-horizontalTitle"
                 |> addAttribute "data-idd-placement" placementStr
                 |> addText label
-        parent |> addDiv labelNode
+        labelNode
 
     let getXYDataDom xSeries ySeries =                
         sprintf "x float64.1D %s\ny float64.1D %s" (Utils.encodeFloat64ArrayBase64 (Array.ofSeq xSeries)) (Utils.encodeFloat64ArrayBase64 (Array.ofSeq ySeries))
@@ -313,17 +313,33 @@ module internal HtmlConverters =
                 parent |> addDiv gridNode
             |   GridLines.Disabled -> parent
 
+    let addVisibleRegionAttribute visRegion= 
+        match visRegion with
+        |   Autofit padding -> addAttribute "data-idd-padding" (sprintf "%d" padding)
+        |   Explicit(xmin,ymin,xmax,ymax) -> addAttribute "data-idd-visible-region" (sprintf "%f %f %f %f" xmin xmax ymin ymax)
+    
+    let getEffectiveLegendvisibility isLegendEnabled plots =
+            match isLegendEnabled with
+            |   Visible -> true
+            |   Hidden -> false
+            |   Automatic ->
+                let isNameDefined plot =
+                    match plot with
+                    |   Polyline p -> p.Name <> null
+                    |   Markers m -> m.Name <> null
+                    |   Bars b -> b.Name <> null
+                    |   Histogram h -> h.Name <> null
+                    |   Heatmap hm -> hm.Name <> null
+                List.exists isNameDefined plots
+
+    
     let toHtmlStructure (chart:Chart) =
-        let chartNode =
-            let addVisibleRegionAttribute = 
-                match chart.VisibleRegion with
-                |   Autofit padding -> addAttribute "data-idd-padding" (sprintf "%d" padding)
-                |   Explicit(xmin,ymin,xmax,ymax) -> addAttribute "data-idd-visible-region" (sprintf "%f %f %f %f" xmin xmax ymin ymax)
+        let chartNode =            
             createDiv()
             |> addAttribute "class" "fsharp-idd" 
             |> addAttribute "data-idd-plot" "figure" 
             |> addAttribute "style" (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
-            |> addVisibleRegionAttribute        
+            |> addVisibleRegionAttribute chart.VisibleRegion
         
         let yAxis = axisToHtmlStructure chart.Yaxis Left
         let chartNode, yAxisID = 
@@ -333,7 +349,7 @@ module internal HtmlConverters =
         
         let chartNode = 
             if chart.Ylabel <> null then
-                vertAxisLabelToHtmlStructue chart.Ylabel Left chartNode
+                addDiv (vertAxisLabelToHtmlStructue chart.Ylabel Left) chartNode
             else
                 chartNode
         
@@ -345,26 +361,13 @@ module internal HtmlConverters =
 
         let chartNode = 
             if chart.Xlabel <> null then
-                horAxisLabelToHtmlStructure chart.Xlabel Bottom chartNode
+                addDiv (horAxisLabelToHtmlStructure chart.Xlabel Bottom) chartNode
             else
                 chartNode
-        
-        let effectiveLegendvisibility =
-            match chart.IsLegendEnabled with
-            |   Visible -> true
-            |   Hidden -> false
-            |   Automatic ->
-                let isNameDefined plot =
-                    match plot with
-                    |   Polyline p -> p.Name <> null
-                    |   Markers m -> m.Name <> null
-                    |   Bars b -> b.Name <> null
-                    |   Histogram h -> h.Name <> null
-                    |   Heatmap hm -> hm.Name <> null
-                List.exists isNameDefined chart.Plots
-
+                
+        let effectiveLegendvisibility = getEffectiveLegendvisibility chart.IsLegendEnabled chart.Plots
         let chartNode = chartNode |> addAttribute "data-idd-legend-enabled" (if effectiveLegendvisibility then "true" else "false")            
-        let chartNode = chartNode |> addAttribute "data-idd-navigation-enabled" (if chart.IsNavigationEnabled then "true" else "false")            
+        let chartNode = chartNode |> addAttribute "data-idd-navigation-enabled" (if chart.IsNavigationEnabled then "true" else "false")
 
         let chartNode = 
             if chart.Title <> null then

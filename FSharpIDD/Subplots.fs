@@ -49,6 +49,28 @@ module Subplots =
             ColumnsCount = ncol
             ExternalLegendSource = None
         }
+    
+    /// Adds/Replaces the particular chart in subplots
+    let setSubplot rowIdx colIdx chart subplots =
+        {
+            subplots with
+                Charts = Map.add (rowIdx,colIdx) chart subplots.Charts
+        }
+    
+    /// Sets the size of each subplot within subplots grid
+    let setSubplotSize width height subplots =
+        {
+            subplots with
+                PlotWidth = width;
+                PlotHeight = height
+        }
+    
+    /// Sets the title for the whole subplots grid
+    let setTitle title subplots :Subplots =
+        {
+            subplots with
+                Title = title
+        }
 
     /// the chart without axis and titles
     /// Used to be placed into the slot of subplots
@@ -112,32 +134,60 @@ module Subplots =
     let internal slotToHtmlStructure plotWidth plotHeight (slot:Slot) : DOM.Node =
         match slot with
         |   Empty -> DOM.Empty
-        |   Axis(axis,placement,title) ->        
-            let div = DOM.createDiv()
-            let axisNode = HtmlConverters.axisToHtmlStructure axis placement
-            let div =
+        |   Axis(axis,placement,title) ->                    
+            let slotContent = DOM.createDiv()                
+            let tryAddAxisTitle slotContent =
+                if title <> null then
+                    let axisTitle =
+                        match placement with
+                        |   Left| Right ->
+                            vertAxisLabelToHtmlStructue title placement 
+                            |>   addAttribute "style" (sprintf "height: %dpx; position: relative;" plotHeight)
+                        |   Top | Bottom ->
+                            horAxisLabelToHtmlStructure title placement
+                            |>   addAttribute "style" (sprintf "width: %dpx;" plotWidth)
+                    DOM.addDiv axisTitle slotContent
+                else
+                    slotContent
+            let tryAddAxis slotContent =
+                let axisNode = HtmlConverters.axisToHtmlStructure axis placement                
                 match axisNode with
-                |   Some(axis,_) ->
+                |   Some(axis,_) ->                                           
+                    // fixing sizes
                     let axis = 
                         match placement with
                         |   Left| Right -> axis |> DOM.addAttribute "style" (sprintf "height: %dpx;" plotHeight)
                         |   Top | Bottom -> axis |> DOM.addAttribute "style" (sprintf "width: %dpx;" plotWidth)
-                    DOM.addDiv axis div
-                |   None -> div
-            let div =
-                if title <> null then
-                    match placement with
-                    |   Left| Right -> vertAxisLabelToHtmlStructue title placement div 
-                    |   Top | Bottom -> horAxisLabelToHtmlStructure title placement div 
-                else
-                    div
-            Div div
-        |   Plot(bareChart) ->       
+                    // setting the styles that control the alignment
+                    let axis = 
+                        match placement with
+                        | Left -> axis |> DOM.addAttribute "class" "idd-subplots-slot-left"
+                        | Right -> axis |> DOM.addAttribute "class" "idd-subplots-slot-right"
+                        | Top -> axis |> DOM.addAttribute "class" "idd-subplots-slot-top"
+                        | Bottom -> axis |> DOM.addAttribute "class" "idd-subplots-slot-bottom"
+                    DOM.addDiv axis slotContent
+                |   None -> slotContent
+            let slotContent =
+                match placement with
+                |   Left ->
+                    slotContent
+                    |> addAttribute "style" (sprintf "height: %dpx; display: flex; justify-content: flex-end;" plotHeight)
+                    |> tryAddAxisTitle
+                    |> tryAddAxis
+                |   Bottom ->
+                    slotContent
+                    |> addAttribute "style" (sprintf "width: %dpx; display: flex; flex-direction: column; justify-content: flex-start;" plotWidth)                    
+                    |> tryAddAxis
+                    |> tryAddAxisTitle
+                |   _   -> failwith "Not supported exception"
+            Div slotContent
+        |   Plot(bareChart) ->
             let div =
                 DOM.createDiv()
                 |> DOM.addAttribute "data-idd-plot" "plot"
+                |> DOM.addAttribute "class" "idd-subplot"                
                 |> DOM.addAttribute "style" (sprintf "height: %dpx; width: %dpx;" plotHeight plotWidth)
-                |> DOM.addAttribute "data-idd-padding" "1"
+                |> addVisibleRegionAttribute bareChart.VisibleRegion
 
             let plotTrap =
                 let plotDiv = createDiv()
@@ -146,12 +196,16 @@ module Subplots =
             let div = DOM.addDiv plotTrap div
 
             let div = HtmlConverters.gridLinesToHtmlStructure bareChart.GridLines None None div
-            Div (Seq.fold (fun state t -> let plotDiv = HtmlConverters.plotToDiv t in DOM.addDiv plotDiv state) div bareChart.Plots)
+            let div = Seq.fold (fun state t -> let plotDiv = HtmlConverters.plotToDiv t in DOM.addDiv plotDiv state) div bareChart.Plots
+            let effectiveLegendvisibility = HtmlConverters.getEffectiveLegendvisibility bareChart.IsLegendEnabled bareChart.Plots
+            let div = div |> addAttribute "data-idd-legend-enabled" (if effectiveLegendvisibility then "true" else "false")            
+            let div = div |> DOM.addAttribute "data-idd-navigation-enabled" (if bareChart.IsNavigationEnabled then "true" else "false")
+            Div div
         |   PlotTitle title ->
             let div =
                 DOM.createDiv()
                 |> DOM.addText title
-                |> DOM.addAttribute "class" "title"
+                |> DOM.addAttribute "class" "idd-subplot-title"
             Div div
 
     let internal slotGridToHtmlStructure plotWidth plotHeight (slots: Slot[,]) =

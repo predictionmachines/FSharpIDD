@@ -116,5 +116,5 @@ module DOM =
                                 |   TD cellContent ->
                                     sprintf "<td>%s</td>" (toString cellContent)
                             sprintf "<tr>%s</tr>" (System.String.Join("", cells |> Seq.map cellToStr))
-                    sprintf "<table>%s</table>" (System.String.Join("\n",rowsList |> Seq.map rowToStr))
+                    sprintf "<table class='idd-subplots-table'>%s</table>" (System.String.Join("\n",rowsList |> Seq.map rowToStr))
             |   Empty -> ""

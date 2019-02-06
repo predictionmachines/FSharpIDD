@@ -6,13 +6,7 @@ open FSharpIDD.Plots
 
 [<EntryPoint>]
 let main argv = 
-     // Comparison chart
-
-    let reportChartTemplate = 
-        Chart.Empty
-        |> Chart.setSize 800 600
-        |> Chart.setVisibleRegion (VisibleRegion.Autofit 1)
-        |> Chart.setNavigationEnabled false
+     // Comparison chart     
 
     let m_x1 = [|0.0;0.195277778;0.388888889;0.583055556;0.778055556;0.9725;1.167777778;1.361944444;1.556388889;1.750555556;1.944166667;2.1375;2.331944444;2.525555556;2.719166667;2.912777778;3.106111111;3.301388889;3.495833333;3.69;3.885277778;4.080555556;4.274166667;4.468333333;4.663611111;4.858888889;5.053055556;5.2475;5.441944444;5.636944444;5.831388889;6.025833333;6.219444444;6.414722222;6.609722222;6.804166667;6.998888889;7.193333333;7.387777778;7.582222222;7.7775;7.971666667;8.165277778;8.359722222;8.553888889;8.748611111;8.943888889;9.138333333;9.3325;9.526111111;9.721388889;9.915833333;10.11027778;10.30472222;10.49888889;10.6925;10.8875;11.08138889;11.27583333;11.47027778;11.66472222;11.85888889;12.05444444;12.24888889;12.4425;12.63694444;12.83138889;13.025;13.21944444;13.41388889;13.60916667;13.80361111;13.99916667;14.19361111;14.38888889;14.58333333;14.77777778;14.97305556;15.16666667;15.36027778;15.555;15.74861111;15.9425;16.13722222;16.33083333;16.52527778;16.72;16.91472222;17.10833333;17.30222222;17.4975;17.69111111;17.88555556;18.08027778;18.27583333;18.46944444;18.66333333;18.85833333;19.05277778;19.2475|]
     let m_y1 = [|309.0;314.0;320.0;309.0;317.0;315.0;324.0;332.0;332.0;346.0;364.0;357.0;383.0;396.0;413.0;440.0;462.0;504.0;554.0;592.0;640.0;721.0;753.0;834.0;933.0;1020.0;1143.0;1252.0;1422.0;1560.0;1728.0;1918.0;2080.0;2283.0;2546.0;2801.0;3007.0;3279.0;3548.0;3800.0;4076.0;4273.0;4521.0;4734.0;5012.0;5149.0;5377.0;5498.0;5634.0;5770.0;5928.0;6075.0;6183.0;6244.0;6381.0;6442.0;6551.0;6564.0;6682.0;6801.0;6932.0;7141.0;7212.0;7403.0;7452.0;7605.0;7719.0;7867.0;7866.0;8133.0;8133.0;8223.0;8366.0;8418.0;8515.0;8676.0;8706.0;8837.0;8882.0;9012.0;9102.0;9082.0;9168.0;9346.0;9328.0;9409.0;9555.0;9657.0;9605.0;9672.0;9781.0;9764.0;9921.0;10003.0;10131.0;10140.0;10208.0;10287.0;10290.0;10451.0|]
@@ -49,22 +43,22 @@ let main argv =
         |> Polyline.setStrokeColour Colour.LightBlue //##ADD8E6 lightblue
 
     let comparisionChart =
-        reportChartTemplate        
+        Chart.Empty        
+        |> Chart.setVisibleRegion (VisibleRegion.Autofit 1)
+        |> Chart.setNavigationEnabled false 
         |> Chart.setSize 250 200
 
         |> Chart.setTitle "C12 = 3.81"        
         |> Chart.setXlabel "Time (h)"
-        //|> Chart.setYlabel "Fluorescence"        
+        |> Chart.setYlabel "Fluorescence"        
 
         |> Chart.addPolyline polyline1
         |> Chart.addPolyline polyline2
         |> Chart.addMarkers markers1
         |> Chart.addMarkers markers2
-        //|> Chart.setXaxis Axis.Hidden
-        //|> Chart.setYaxis Axis.Hidden
         |> Chart.setNavigationEnabled true
     
-    let grid = Subplots.createSubplots 8 6 (fun r c -> Some (Chart.setTitle (sprintf "plot %d %d" (r+1) (c+1)) comparisionChart)) |> Subplots.commonAxes    
+    let grid = Subplots.createSubplots 8 6 (fun r c -> Some (Chart.setTitle (sprintf "plot %d %d" (r+1) (c+1)) comparisionChart)) // |> Subplots.commonAxes    
     let generatedStr = HTML.ofSubplots grid
 
     let template = File.ReadAllText "template.html"
