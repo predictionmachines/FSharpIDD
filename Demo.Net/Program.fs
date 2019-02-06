@@ -51,7 +51,7 @@ let main argv =
     let template = File.ReadAllText "template.html"
 
     // Injecting it into the HTML template
-    let html = template.Replace("<%PLACEHOLDER%>",generatedChart)
+    let html = template.Replace("<%PLACEHOLDER%>", generatedChart)
     printfn "%s" generatedChart
     let writer = File.CreateText("chart.html")
     writer.Write(html)

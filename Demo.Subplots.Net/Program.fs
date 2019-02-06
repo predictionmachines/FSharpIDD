@@ -58,7 +58,7 @@ let main argv =
         |> Chart.addMarkers markers2
         |> Chart.setNavigationEnabled true
     
-    let grid = Subplots.createSubplots 8 6 (fun r c -> Some (Chart.setTitle (sprintf "plot %d %d" (r+1) (c+1)) comparisionChart)) // |> Subplots.commonAxes    
+    let grid = Subplots.createSubplots 8 6 (fun r c -> Some (Chart.setTitle (sprintf "plot %d %d" (r+1) (c+1)) comparisionChart))
     let generatedStr = HTML.ofSubplots grid
 
     let template = File.ReadAllText "template.html"
