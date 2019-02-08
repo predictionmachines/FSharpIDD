@@ -47,8 +47,7 @@ let main argv =
         |> Chart.setVisibleRegion (VisibleRegion.Autofit 1)
         |> Chart.setNavigationEnabled false 
         |> Chart.setSize 250 200
-
-        |> Chart.setTitle "C12 = 3.81"        
+                
         |> Chart.setXlabel "Time (h)"
         |> Chart.setYlabel "Fluorescence"        
 

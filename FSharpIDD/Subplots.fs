@@ -176,7 +176,7 @@ module Subplots =
                     |> tryAddAxis
                 |   Bottom ->
                     slotContent
-                    |> addAttribute "style" (sprintf "width: %dpx; display: flex; flex-direction: column; justify-content: flex-start;" plotWidth)                    
+                    |> addAttribute "style" (sprintf "width: %dpx; display: flex; flex-direction: column; justify-content: flex-start; margin-left: auto; margin-right: auto;" plotWidth)                    
                     |> tryAddAxis
                     |> tryAddAxisTitle
                 |   _   -> failwith "Not supported exception"
