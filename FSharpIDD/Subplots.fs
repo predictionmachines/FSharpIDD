@@ -198,7 +198,7 @@ module Subplots =
             let div = HtmlConverters.gridLinesToHtmlStructure bareChart.GridLines None None div
             let div = Seq.fold (fun state t -> let plotDiv = HtmlConverters.plotToDiv t in DOM.addDiv plotDiv state) div bareChart.Plots
             let effectiveLegendvisibility = HtmlConverters.getEffectiveLegendvisibility bareChart.IsLegendEnabled bareChart.Plots
-            let div = div |> addAttribute "data-idd-legend-enabled" (if effectiveLegendvisibility then "true" else "false")            
+            let div = div |> addAttribute "data-idd-style" (if effectiveLegendvisibility then "isLegendVisible: true;" else "isLegendVisible: false;")            
             let div = div |> DOM.addAttribute "data-idd-navigation-enabled" (if bareChart.IsNavigationEnabled then "true" else "false")
             Div div
         |   PlotTitle title ->

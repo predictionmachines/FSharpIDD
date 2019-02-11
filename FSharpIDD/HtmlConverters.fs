@@ -366,7 +366,7 @@ module internal HtmlConverters =
                 chartNode
                 
         let effectiveLegendvisibility = getEffectiveLegendvisibility chart.IsLegendEnabled chart.Plots
-        let chartNode = chartNode |> addAttribute "data-idd-legend-enabled" (if effectiveLegendvisibility then "true" else "false")            
+        let chartNode = chartNode |> addAttribute "data-idd-style" (if effectiveLegendvisibility then "isLegendVisible: true;" else "isLegendVisible: false")            
         let chartNode = chartNode |> addAttribute "data-idd-navigation-enabled" (if chart.IsNavigationEnabled then "true" else "false")
 
         let chartNode = 

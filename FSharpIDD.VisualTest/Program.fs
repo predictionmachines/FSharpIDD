@@ -163,7 +163,7 @@ let getTestText() =
         ],
         labelledAxisStr
     
-    let tests = 
+    let chartTests = 
         [
             emptyChartTest
             scientificNotationTest
@@ -221,7 +221,20 @@ let getTestText() =
             corrMapTest
         ]
 
-    let tests = List.mapi (fun i elem -> let testName, descrList, chart = elem in (sprintf "%d. %s" (i+1) testName), descrList, HTML.ofChart chart) tests
+    let tests1 = List.mapi (fun i elem -> let testName, descrList, chart = elem in (sprintf "%d. %s" (i+1) testName), descrList, HTML.ofChart chart) chartTests
+
+    let subplotsTests = 
+        [
+            SubplotsTests.subplots1
+        ]
+    
+    let tests2 = List.mapi (fun i elem -> let testName, descrList, subplots = elem in (sprintf "%d. %s" (i+1) testName), descrList, HTML.ofSubplots subplots) subplotsTests
+
+    let tests = 
+        [
+            tests1;
+            tests2
+        ] |> List.concat
 
     let generatedDiv = tests |> CollectionToHtml.toHTML 
     

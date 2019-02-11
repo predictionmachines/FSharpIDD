@@ -3,8 +3,8 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=10; IE=Edge" />
     <title>F# IDD Visual Tests</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.20/dist/idd.css" />
-    <!--<link rel="stylesheet" type="text/css" href="../src/css/IDDTheme.css" />-->
+    <!--<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.21/dist/idd.css" />-->
+    <link rel="stylesheet" type="text/css" href="idd.css" />
     <link rel="stylesheet" href="template.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js">
@@ -15,14 +15,20 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js">
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.20/dist/idd.js">
+    <!--<script src="https://cdn.jsdelivr.net/npm/interactive-data-display@1.5.21/dist/idd.js">-->
+    <script src="idd.js">
     </script>
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $(".fsharp-idd").each(function(index) {
+            $(".fsharp-idd").each(function (index) {
                 InteractiveDataDisplay.asPlot($(this));
             })
+            $("table").each(function (index) {
+                var subplots = InteractiveDataDisplay.SubPlots(this)
+            })
+
+
         });
     </script>
 </head>

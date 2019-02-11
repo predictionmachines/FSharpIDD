@@ -26,4 +26,4 @@ let toHTML (sampleList: (string*(string list)*string)list) =
 
     let testsContainer = sampleList |> Seq.fold arrangeSample testsContainer    
     
-    Div (addDiv testsContainer (createDiv())) |> toString
+    Div (addDiv testsContainer (createDiv())) |> toString    
