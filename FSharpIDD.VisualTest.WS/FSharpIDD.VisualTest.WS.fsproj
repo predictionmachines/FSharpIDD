@@ -68,6 +68,9 @@
     <Compile Include="..\FSharpIDD.VisualTest\PolylineTests.fs">
       <Link>PolylineTests.fs</Link>
     </Compile>
+    <Compile Include="..\FSharpIDD.VisualTest\SubplotsTests.fs">
+      <Link>SubplotsTests.fs</Link>
+    </Compile>
     <Compile Include="..\FSharpIDD.VisualTest\Program.fs">
       <Link>Program.fs</Link>
     </Compile>

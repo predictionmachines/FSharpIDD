@@ -1,4 +1,5 @@
-﻿module SubplotsTests
+﻿[<WebSharper.JavaScript>]
+module SubplotsTests
 
 open FSharpIDD
 open FSharpIDD.Plots
@@ -46,8 +47,7 @@ let comparisonChart =
     let comparisionChart =
         Chart.Empty        
         |> Chart.setVisibleRegion (VisibleRegion.Autofit 1)
-        |> Chart.setLegendEnabled LegendVisibility.Hidden
-        |> Chart.setSize 250 200
+        |> Chart.setLegendEnabled LegendVisibility.Hidden        
                 
         |> Chart.setXlabel "Time (h)"
         |> Chart.setYlabel "Fluorescence"        
@@ -92,7 +92,7 @@ let setSubplotTest =
 let setSubplotSizeTest =    
     let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
     let subplots =
-        subplots |> Subplots.setSubplotSize 300 200
+        subplots |> Subplots.setSubplotSize 350 150
     "setSubplotSize",
     ["|> Subplots.setSubplotSize 300 200"],
     subplots   
