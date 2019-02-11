@@ -67,6 +67,7 @@ let subplots1 =
             Some {
                 comparisonChart with
                     IsLegendEnabled = LegendVisibility.Visible
+                    Title = "Upper-right chart"
             }
         | 1,0 -> 
             Some {
@@ -78,3 +79,20 @@ let subplots1 =
     "Subplots",
     ["2x2 plots"],
     subplots
+
+let setSubplotTest =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots |> Subplots.setSubplot 0 1 None
+    "setSubplot",
+    ["Subplots.setSubplot 0 1 None"],
+    subplots    
+
+
+let setSubplotSizeTest =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots |> Subplots.setSubplotSize 300 200
+    "setSubplotSize",
+    ["|> Subplots.setSubplotSize 300 200"],
+    subplots   

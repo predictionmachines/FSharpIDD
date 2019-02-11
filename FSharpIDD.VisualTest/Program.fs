@@ -226,6 +226,8 @@ let getTestText() =
     let subplotsTests = 
         [
             SubplotsTests.subplots1
+            SubplotsTests.setSubplotTest
+            SubplotsTests.setSubplotSizeTest
         ]
     
     let tests2 = List.mapi (fun i elem -> let testName, descrList, subplots = elem in (sprintf "%d. %s" (i+1) testName), descrList, HTML.ofSubplots subplots) subplotsTests
@@ -244,7 +246,7 @@ let getTestText() =
 #else
 [<EntryPoint>]
 let main argv =
-    let template = System.IO.File.ReadAllText "template.html"    
+    let template = System.IO.File.ReadAllText "template.html"
     let generatedDiv = getTestText()
     let html = template.Replace("<%PLACEHOLDER%>", generatedDiv)
     printfn "%s" generatedDiv

@@ -64,13 +64,13 @@ module Subplots =
                 PlotWidth = width;
                 PlotHeight = height
         }
-    
+    (*
     /// Sets the title for the whole subplots grid
     let setTitle title subplots :Subplots =
         {
             subplots with
                 Title = title
-        }
+        }*)
 
     /// the chart without axis and titles
     /// Used to be placed into the slot of subplots
@@ -171,12 +171,12 @@ module Subplots =
                 match placement with
                 |   Left ->
                     slotContent
-                    |> addAttribute "style" (sprintf "height: %dpx; display: flex; justify-content: flex-end;" plotHeight)
+                    |> addAttribute "style" (sprintf "height: %dpx; display: flex; justify-content: flex-end; padding-left: 20px;" plotHeight)
                     |> tryAddAxisTitle
                     |> tryAddAxis
                 |   Bottom ->
                     slotContent
-                    |> addAttribute "style" (sprintf "width: %dpx; display: flex; flex-direction: column; justify-content: flex-start; margin-left: auto; margin-right: auto;" plotWidth)                    
+                    |> addAttribute "style" (sprintf "width: %dpx; display: flex; flex-direction: column; justify-content: flex-start; margin-left: auto; margin-right: auto; padding-bottom: 20px;" plotWidth)                    
                     |> tryAddAxis
                     |> tryAddAxisTitle
                 |   _   -> failwith "Not supported exception"
@@ -224,6 +224,7 @@ module Subplots =
         let htmlStructure = slotGridToHtmlStructure subplots.PlotWidth subplots.PlotHeight slots
         htmlStructure    
 
+        (*
     let commonAxes subplots =
         let lastRow = subplots.RowsCount-1
         let replaceAxes r c chart =
@@ -237,4 +238,4 @@ module Subplots =
         {
             subplots with
                 Charts = Map.map (fun key chart-> let r,c = key in replaceAxes r c chart) subplots.Charts
-        }
+        }*)
