@@ -156,7 +156,10 @@ module Chart =
     let setGridLines gridLines chart = {chart with GridLines = gridLines}
     
     /// Set the visibility of the plot legend floating in the top-right region of the chart
-    let setLegendEnabled legendVisibility chart = {chart with IsLegendEnabled = legendVisibility}
+    let setLegendEnabled legendVisibility chart = { chart with IsLegendEnabled = legendVisibility }
 
     /// Set whether the chart can be navigated with a mouse or touch gestures
-    let setNavigationEnabled isEnabled chart = {chart with IsNavigationEnabled = isEnabled}    
+    let setNavigationEnabled isEnabled chart = { chart with IsNavigationEnabled = isEnabled }
+
+    /// Sets whether the plot coordinates are shown in the tooltips of the chart
+    let setIsTooltipPlotCoordsEnabled isEnabled chart = { chart with IsTooltipPlotCoordsEnabled = isEnabled }
