@@ -184,10 +184,14 @@ module Subplots =
         |   Plot(bareChart) ->
             let div =
                 DOM.createDiv()
-                |> DOM.addAttribute "data-idd-plot" "plot"
-                |> DOM.addAttribute "class" "idd-subplot"                
-                |> DOM.addAttribute "style" (sprintf "height: %dpx; width: %dpx;" plotHeight plotWidth)
-                |> addVisibleRegionAttribute bareChart.VisibleRegion
+
+            let attrMap = Map.add "data-idd-plot" "plot" Map.empty
+            let attrMap = Map.add "class" "idd-subplot" attrMap
+            let attrMap = Map.add "style" (sprintf "height: %dpx; width: %dpx;" plotHeight plotWidth) attrMap
+
+            let attrMap, styleMap =
+                addVisibleRegionInfo bareChart.VisibleRegion attrMap Map.empty
+
 
             let plotTrap =
                 let plotDiv = createDiv()
@@ -197,10 +201,19 @@ module Subplots =
 
             let div = HtmlConverters.gridLinesToHtmlStructure bareChart.GridLines None None div
             let div = Seq.fold (fun state t -> let plotDiv = HtmlConverters.plotToDiv t in DOM.addDiv plotDiv state) div bareChart.Plots
+
             let effectiveLegendvisibility = HtmlConverters.getEffectiveLegendvisibility bareChart.IsLegendEnabled bareChart.Plots
-            let div = div |> addAttribute "data-idd-style" (if effectiveLegendvisibility then "isLegendVisible: true;" else "isLegendVisible: false;")            
-            let div = div |> DOM.addAttribute "data-idd-navigation-enabled" (if bareChart.IsNavigationEnabled then "true" else "false")
+            let styleMap = Map.add "isLegendVisible" (if effectiveLegendvisibility then "true" else "false") styleMap
+
+            let attrMap = Map.add "data-idd-navigation-enabled" (if bareChart.IsNavigationEnabled then "true" else "false") attrMap
+
+            
+            let styleStrTitle, styleStr = createStyleAttributes styleMap
+            let attrMap =  Map.add styleStrTitle styleStr attrMap
+            let div = addAttributes attrMap div
+
             Div div
+
         |   PlotTitle title ->
             let div =
                 DOM.createDiv()
