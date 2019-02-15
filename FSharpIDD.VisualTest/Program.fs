@@ -128,6 +128,16 @@ let getTestText() =
             "The polyline bounds touch the chart bounds"
         ],
         paddingRemovedChartStr
+    
+    let paddingAddedChart = Chart.addPolyline {blue20RoundRoundCurve with Thickness = 1.0} Empty
+    let paddingAddedChartStr = paddingAddedChart |> Chart.setVisibleRegion (Autofit 20)
+    let paddingAddedTest =
+        "Visible padding added",
+        [
+            "|> Chart.setVisibleRegion (Autofit 20)"
+            "The polyline bounds don't touch the chart bounds"
+        ],
+        paddingAddedChartStr
 
     // Explicit visual region    
     let explicitVisualRegionStr = blue20RoundRoundCurveChart |> Chart.setVisibleRegion (Explicit(-1.0,-1.0,15.0,5.0))
@@ -196,6 +206,7 @@ let getTestText() =
             gridDisabledLinesTest
             gridStyledLinesTest
             paddingRemovedTest
+            paddingAddedTest
             explicitVisualRegionTest
             labelledAxisTest
             labelledAxisTiltedTest
