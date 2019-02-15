@@ -19,11 +19,14 @@
         $(document).ready(function () {
             var str = Tests.getTestText()
             document.body.innerHTML = str
-            $(".fsharp-idd").each(function (index) {
+            $("div.fsharp-idd").each(function (index) {
                 try {
                     InteractiveDataDisplay.asPlot($(this));
                 }
                 catch (e) { console.log("caught "+e) }
+            })
+            $("table.idd-subplots-table").each(function (index) {
+                InteractiveDataDisplay.asSubPlots(this)
             })
         });
     </script>
