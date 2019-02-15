@@ -288,6 +288,17 @@ module internal HtmlConverters =
         |   Histogram h -> histogramToDiv h
         |   Heatmap hm -> heatmapToDiv hm
 
+    let createStyleAttributes iddStyleMap =
+        let styleStr =
+            iddStyleMap
+            |> Map.fold (fun state key value -> state + key + ": " + value + "; ") ""
+        "data-idd-style", styleStr
+
+    let addAttributes attrMap node =
+        let filledNode =
+            Map.fold (fun nnode attrName attrVal -> nnode |> addAttribute attrName attrVal) node attrMap
+        filledNode
+
     let gridLinesToHtmlStructure gridlines xAxisID yAxisID parent =
         match gridlines with
             |   GridLines.Enabled(colour,thickness) ->                
@@ -312,11 +323,6 @@ module internal HtmlConverters =
                     |   Option.None -> gridNode
                 parent |> addDiv gridNode
             |   GridLines.Disabled -> parent
-
-    let addVisibleRegionAttribute visRegion= 
-        match visRegion with
-        |   Autofit padding -> addAttribute "data-idd-padding" (sprintf "%d" padding)
-        |   Explicit(xmin,ymin,xmax,ymax) -> addAttribute "data-idd-visible-region" (sprintf "%f %f %f %f" xmin xmax ymin ymax)
     
     let getEffectiveLegendvisibility isLegendEnabled plots =
             match isLegendEnabled with
@@ -332,14 +338,25 @@ module internal HtmlConverters =
                     |   Heatmap hm -> hm.Name <> null
                 List.exists isNameDefined plots
 
+    let addVisibleRegionInfo visRegion attrMap iddStyleMap = 
+        match visRegion with
+        |   Autofit padding -> attrMap, (Map.add "padding" (sprintf "%d" padding) iddStyleMap)
+        |   Explicit(xmin,ymin,xmax,ymax) -> (Map.add "data-idd-visible-region" (sprintf "%f %f %f %f" xmin xmax ymin ymax) attrMap), iddStyleMap
+
     
     let toHtmlStructure (chart:Chart) =
         let chartNode =            
             createDiv()
-            |> addAttribute "class" "fsharp-idd" 
-            |> addAttribute "data-idd-plot" "figure" 
-            |> addAttribute "style" (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
-            |> addVisibleRegionAttribute chart.VisibleRegion
+
+        let chartAttrMap =
+            Map.ofList [
+                "class", "fsharp-idd"
+                "data-idd-plot", "figure"
+                "style", (sprintf "width: %dpx; height: %dpx;" chart.Width chart.Height)
+            ]
+
+        let chartAttrMap, iddStyleMap =
+            addVisibleRegionInfo chart.VisibleRegion chartAttrMap Map.empty
         
         let yAxis = axisToHtmlStructure chart.Yaxis Left
         let chartNode, yAxisID = 
@@ -366,30 +383,32 @@ module internal HtmlConverters =
                 chartNode
                 
         let effectiveLegendvisibility = getEffectiveLegendvisibility chart.IsLegendEnabled chart.Plots
-        let chartNode = chartNode |> addAttribute "data-idd-style" (if effectiveLegendvisibility then "isLegendVisible: true;" else "isLegendVisible: false")            
-        let chartNode = chartNode |> addAttribute "data-idd-navigation-enabled" (if chart.IsNavigationEnabled then "true" else "false")
+        
+        let iddStyleMap = Map.add "isLegendVisible" (if effectiveLegendvisibility then "true" else "false") iddStyleMap
+        let iddStyleMap = if not chart.IsTooltipPlotCoordsEnabled then Map.add "suppress-tooltip-coords" "true" iddStyleMap else iddStyleMap
+        
+        let chartAttrMap = Map.add "data-idd-navigation-enabled" (if chart.IsNavigationEnabled then "true" else "false") chartAttrMap
 
         let chartNode = 
             if chart.Title <> null then
                 let titleNode =
                     createDiv()
-                    |> addAttribute "class" "idd-title"
-                    |> addAttribute "data-idd-placement" "top"
                     |> addText chart.Title
-                chartNode |> addDiv titleNode
+                let titleAttrMap = Map.add "class" "idd-title" Map.empty
+                let titleAttrMap = Map.add "data-idd-placement" "top" titleAttrMap
+                let titleNode = addAttributes titleAttrMap titleNode
+                (chartNode |> addDiv titleNode)
             else
                 chartNode
-        
-        let chartNode =
-            if chart.IsTooltipPlotCoordsEnabled then
-                chartNode
-            else
-                chartNode |> addAttribute "data-idd-suppress-tooltip-coords" "true"
         
         let chartNode =
             gridLinesToHtmlStructure chart.GridLines xAxisID yAxisID chartNode
 
         let plotElems = chart.Plots |> Seq.map plotToDiv
         let chartNode = Seq.fold (fun state elem -> addDiv elem state) chartNode plotElems
+        
+        let styleStrTitle, styleStr = createStyleAttributes iddStyleMap
+        let chartAttrMap =  Map.add styleStrTitle styleStr chartAttrMap
+        let chartNode = addAttributes chartAttrMap chartNode
         
         Div chartNode
