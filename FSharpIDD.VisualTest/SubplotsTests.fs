@@ -95,4 +95,20 @@ let setSubplotSizeTest =
         subplots |> Subplots.setSubplotSize 350 150
     "setSubplotSize",
     ["|> Subplots.setSubplotSize 300 200"],
-    subplots   
+    subplots
+
+let setSubplotExtLegendRightTest =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots |> Subplots.setExternalLegend Right 0 0
+    "setExternalLegend",
+    ["There is a common legend to the right of the subplots grid"],
+    subplots
+
+let setSubplotExtLegendBottomTest =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots |> Subplots.setExternalLegend Bottom 0 0
+    "setExternalLegend",
+    ["There is a common legend to the bottom of the subplots grid"],
+    subplots

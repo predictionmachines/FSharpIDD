@@ -64,6 +64,23 @@ module Subplots =
                 PlotWidth = width;
                 PlotHeight = height
         }
+    
+    /// Enables the legend which is placed next to the subplots table.
+    /// Placement specify at which side with regards to the subplots table the legend is placed
+    /// legendSource row and columns are the indices of the plot which is used for legend content extraction
+    let setExternalLegend placement legendSourceRow legendSourceCol subplots =
+        {
+            subplots with
+                ExternalLegendSource = Some(legendSourceRow,legendSourceCol,placement)
+        }
+    
+    /// Disables the legend which is placed next to the subplots table.
+    let disableExternalLegend subplots =
+        {
+            subplots with
+                ExternalLegendSource = None
+        }
+    
     (*
     /// Sets the title for the whole subplots grid
     let setTitle title subplots :Subplots =
@@ -229,13 +246,24 @@ module Subplots =
             Cells(seq { 0 .. (cols-1)} |> Seq.map (fun col -> TD(slots.[i,col] |> slotToHtmlStructure plotWidth plotHeight)) |> Seq.rev |> List.ofSeq)
         let rows = 
             Rows(seq { 0 .. (rows - 1) } |> Seq.map getRow |> Seq.rev |> List.ofSeq)
-        DOM.Table rows
+        rows
 
     /// Coverts the subplots object into corresponding HTML structure
     let internal subplotsToHtmlStructure subplots =
         let slots = subplotsToSlotGrid subplots
-        let htmlStructure = slotGridToHtmlStructure subplots.PlotWidth subplots.PlotHeight slots
-        htmlStructure    
+        let slotsStructure = slotGridToHtmlStructure subplots.PlotWidth subplots.PlotHeight slots
+        let subplotsDiv =
+            createDiv()
+            |> addAttribute "class" "idd-subplots"
+        let subplotsDiv =
+            match subplots.ExternalLegendSource with
+            |   Some(rowIdx, colIdx, placement) ->
+                let placementStr = placementToStr placement
+                addAttribute "data-idd-ext-legend" (sprintf "%s %d %d" placementStr rowIdx colIdx) subplotsDiv
+            |   None -> subplotsDiv
+        let subplotsDiv = addTable slotsStructure subplotsDiv
+        Div subplotsDiv
+        
 
         (*
     let commonAxes subplots =
