@@ -162,6 +162,39 @@ let getTestText() =
             "Polyline with a horizontal axis, where labels are tilted"
         ],
         labelledAxisStr
+
+    // Tooltip delay 0
+    let ChartDelay0 : Chart =
+        Chart.Empty
+        |> Chart.setSize 300 200
+        |> Chart.setNavigationEnabled false
+        |> Chart.setTooltipDelay 0
+
+    let ChartDelay0Polyline = Chart.addPolyline (Polyline.setOptions (Polyline.Options(Colour = Colour.Red)) blue20RoundRoundCurve) ChartDelay0
+    let tooltipDelay0Test =
+        "Tooltip delay 0 seconds",
+        [
+            "{ Name = 'Polyline'; X = Xseries; Y = Yseries; Colour = Colour.Red }"
+            "A chart with a polyline. A tooltip should appear immidiately"
+        ],
+        ChartDelay0Polyline
+
+    // Tooltip delay 1
+    let ChartDelay1 : Chart =
+        Chart.Empty
+        |> Chart.setSize 300 200
+        |> Chart.setNavigationEnabled false
+        |> Chart.setTooltipDelay 1
+        
+    let ChartDelay1Polyline = Chart.addPolyline blue20RoundRoundCurve ChartDelay1
+    let tooltipDelay1Test =
+        "Tooltip delay 1 second",
+        [
+            "{ Name = 'Polyline'; X = Xseries; Y = Yseries }"
+            "A chart with a polyline. A tooltip should appear after 1 second"
+        ],
+        ChartDelay1Polyline
+
     
     let chartTests = 
         [
@@ -199,6 +232,8 @@ let getTestText() =
             explicitVisualRegionTest
             labelledAxisTest
             labelledAxisTiltedTest
+            tooltipDelay0Test
+            tooltipDelay1Test
             //bar chart
             basicBarsTest
             emptyOptionsBarsTest

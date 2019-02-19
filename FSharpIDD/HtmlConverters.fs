@@ -404,6 +404,11 @@ module internal HtmlConverters =
         let chartNode =
             gridLinesToHtmlStructure chart.GridLines xAxisID yAxisID chartNode
 
+        let iddStyleMap =
+            match chart.TooltipDelay with
+            |   Some(delay) -> Map.add "tooltipDelay" (sprintf "%i" delay) iddStyleMap
+            |   None -> iddStyleMap
+
         let plotElems = chart.Plots |> Seq.map plotToDiv
         let chartNode = Seq.fold (fun state elem -> addDiv elem state) chartNode plotElems
         
