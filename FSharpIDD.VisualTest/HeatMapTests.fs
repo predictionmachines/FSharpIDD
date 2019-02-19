@@ -70,5 +70,6 @@ let corrMapTest =
             IsLegendEnabled = LegendVisibility.Hidden
             IsTooltipPlotCoordsEnabled=false
             Title = "Correlation"
+            TooltipDelay = Some 0.0
      }    
     |> Chart.addHeatmap corrMap
