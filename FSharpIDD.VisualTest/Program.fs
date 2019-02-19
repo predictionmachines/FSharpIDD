@@ -178,13 +178,13 @@ let getTestText() =
         Chart.Empty
         |> Chart.setSize 300 200
         |> Chart.setNavigationEnabled false
-        |> Chart.setTooltipDelay 0
+        |> Chart.setTooltipDelay 0.0
 
     let ChartDelay0Polyline = Chart.addPolyline (Polyline.setOptions (Polyline.Options(Colour = Colour.Red)) blue20RoundRoundCurve) ChartDelay0
     let tooltipDelay0Test =
         "Tooltip delay 0 seconds",
         [
-            "{ Name = 'Polyline'; X = Xseries; Y = Yseries; Colour = Colour.Red }"
+            "|> Chart.setTooltipDelay 0.0"
             "A chart with a polyline. A tooltip should appear immidiately"
         ],
         ChartDelay0Polyline
@@ -194,13 +194,13 @@ let getTestText() =
         Chart.Empty
         |> Chart.setSize 300 200
         |> Chart.setNavigationEnabled false
-        |> Chart.setTooltipDelay 1
+        |> Chart.setTooltipDelay 1.0
         
     let ChartDelay1Polyline = Chart.addPolyline blue20RoundRoundCurve ChartDelay1
     let tooltipDelay1Test =
         "Tooltip delay 1 second",
         [
-            "{ Name = 'Polyline'; X = Xseries; Y = Yseries }"
+            "|> Chart.setTooltipDelay 1.0"
             "A chart with a polyline. A tooltip should appear after 1 second"
         ],
         ChartDelay1Polyline

@@ -406,7 +406,7 @@ module internal HtmlConverters =
 
         let iddStyleMap =
             match chart.TooltipDelay with
-            |   Some(delay) -> Map.add "tooltipDelay" (sprintf "%i" delay) iddStyleMap
+            |   Some(delay) -> Map.add "tooltipDelay" (sprintf "%f" delay) iddStyleMap
             |   None -> iddStyleMap
 
         let plotElems = chart.Plots |> Seq.map plotToDiv
