@@ -103,6 +103,8 @@ module Chart =
         IsTooltipPlotCoordsEnabled: bool
         /// Which visible rectangle is displayed by the chart
         VisibleRegion : VisibleRegion
+        /// Time delay between mouse over and tooltip appearance
+        TooltipDelay : float option
     }
 
     let Empty : Chart = {
@@ -119,6 +121,7 @@ module Chart =
         Plots = []
         VisibleRegion = VisibleRegion.Autofit 20
         IsTooltipPlotCoordsEnabled = true
+        TooltipDelay = None // means not set
     }
 
     let addPolyline polyline chart = { chart with Plots = Polyline(polyline)::chart.Plots }
@@ -163,3 +166,6 @@ module Chart =
 
     /// Sets whether the plot coordinates are shown in the tooltips of the chart
     let setIsTooltipPlotCoordsEnabled isEnabled chart = { chart with IsTooltipPlotCoordsEnabled = isEnabled }
+
+    /// Sets duration of the tooltip delay 
+    let setTooltipDelay delay chart = { chart with TooltipDelay = Some delay }
