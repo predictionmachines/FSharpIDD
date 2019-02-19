@@ -17,7 +17,7 @@ open WebSharper
 
 [<JavaScript>]
 module internal HtmlConverters =
-    let axisPlacementToStr placement =
+    let placementToStr placement =
             match placement with
                 |   Top -> "top"
                 |   Bottom -> "bottom"
@@ -45,7 +45,7 @@ module internal HtmlConverters =
                     createDiv()
                     |> addAttribute "id" id
                     |> addAttribute "data-idd-axis" "numeric"
-                    |> addAttribute "data-idd-placement" (axisPlacementToStr placement)
+                    |> addAttribute "data-idd-placement" (placementToStr placement)
                     |> addAttribute "style" "position: relative;"
                 let axisNode = if scientificNotationEnabled then addAttribute "data-idd-scientific-notation" "true" axisNode else axisNode
                 
@@ -61,7 +61,7 @@ module internal HtmlConverters =
                     createDiv()
                     |> addAttribute "id" id
                     |> addAttribute "data-idd-axis" "labels"
-                    |> addAttribute "data-idd-placement" (axisPlacementToStr placement)
+                    |> addAttribute "data-idd-placement" (placementToStr placement)
                     |> addAttribute "style" "position: relative;"
                     |> addAttribute "data-idd-style" tiltString
                     |> addText (getDataDomWithTicksLabels ticks labels)
@@ -74,7 +74,7 @@ module internal HtmlConverters =
     let vertAxisLabelToHtmlStructue label placement =
         let placementStr = 
             match placement with
-            |   Left | Right -> axisPlacementToStr placement
+            |   Left | Right -> placementToStr placement
             |   Bottom | Top -> failwith "wrong placement"
         let containerNode =
             let labelNode =
@@ -91,7 +91,7 @@ module internal HtmlConverters =
         let placementStr = 
             match placement with
             |   Left | Right -> failwith "wrong placement"
-            |   Bottom | Top -> axisPlacementToStr placement
+            |   Bottom | Top -> placementToStr placement
         let labelNode =
             createDiv()
                 |> addAttribute "class" "idd-horizontalTitle"

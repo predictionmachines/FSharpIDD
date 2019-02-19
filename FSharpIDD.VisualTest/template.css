@@ -6,7 +6,9 @@
 }
 
 .test-sample {
-    margin: 2em;
+    margin: 2px;
+    padding: 1em;
+    border: solid 1px black;
     font-family: monospace;
 }
 

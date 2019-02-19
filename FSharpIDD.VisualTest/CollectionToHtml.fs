@@ -12,15 +12,16 @@ let toHTML (sampleList: (string*(string list)*string)list) =
         
         let sampleNode = addAttribute "class" "test-sample" (createDiv())
         
-        let chartNameDiv = addAttribute "class" "test-sample-name" (createDiv())
-        let sampleNode = addDiv (addInnerHtml chartSample (createDiv())) sampleNode
+        let chartNameDiv = addAttribute "class" "test-sample-name" (createDiv())        
 
         let addDescrDiv oldNode descr =
             addDiv (addText descr (addAttribute "class" "test-sample-desc" (createDiv()))) oldNode
-                
-        let sampleNode = chartDescrs |> Seq.fold addDescrDiv sampleNode
-
+        
         let sampleNode = addDiv (addText chartName chartNameDiv) sampleNode
+
+        let sampleNode = chartDescrs |> Seq.fold addDescrDiv sampleNode
+        
+        let sampleNode = addDiv (addInnerHtml chartSample (createDiv())) sampleNode
         
         addDiv sampleNode oldNode
 
