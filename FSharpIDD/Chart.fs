@@ -103,7 +103,8 @@ module Chart =
         IsTooltipPlotCoordsEnabled: bool
         /// Which visible rectangle is displayed by the chart
         VisibleRegion : VisibleRegion
-        /// Time delay between mouse over and tooltip appearance
+        /// Time delay in seconds between mouse over and tooltip appearance.
+        /// None means that the default IDD tooltip settings are used
         TooltipDelay : float option
     }
 
