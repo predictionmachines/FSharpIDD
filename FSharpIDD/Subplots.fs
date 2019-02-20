@@ -13,7 +13,7 @@ module Subplots =
     type Subplots = 
         {
             /// Common title
-            Title: string
+            Title: string option
             /// 0-based rowIdx,colIdx -> chart
             /// The absence of the index pair indicates the blank slot
             Charts: Map<(int*int),Chart option>
@@ -39,7 +39,7 @@ module Subplots =
             let chart = initializer rowIdx colIdx
             Map.add elem chart state    
         {
-            Title = null
+            Title = None
             Charts = Seq.fold folder Map.empty idxPairs
             /// The width of each subplots
             PlotWidth = 300
@@ -81,13 +81,12 @@ module Subplots =
                 ExternalLegendSource = None
         }
     
-    (*
     /// Sets the title for the whole subplots grid
     let setTitle title subplots :Subplots =
         {
             subplots with
-                Title = title
-        }*)
+                Title = Some title
+        }
 
     /// the chart without axis and titles
     /// Used to be placed into the slot of subplots
@@ -252,18 +251,37 @@ module Subplots =
     let internal subplotsToHtmlStructure subplots =
         let slots = subplotsToSlotGrid subplots
         let slotsStructure = slotGridToHtmlStructure subplots.PlotWidth subplots.PlotHeight slots
+
         let subplotsDiv =
             createDiv()
             |> addAttribute "class" "idd-subplots"
+
         let subplotsDiv =
+            match subplots.Title with
+            |   Some(title) ->
+                let subplotsHeaderDiv =
+                    DOM.createDiv()
+                    |> DOM.addText title
+                    |> DOM.addAttribute "class" "idd-subplots-title"
+                subplotsDiv
+                |> addDiv subplotsHeaderDiv
+            |   None -> subplotsDiv
+
+        let subplotsLegendholderDiv =
+            createDiv()
+            |> addAttribute "class" "idd-subplots-legendholder"
+        let subplotsLegendholderDiv =
             match subplots.ExternalLegendSource with
             |   Some(rowIdx, colIdx, placement) ->
                 let placementStr = placementToStr placement
-                addAttribute "data-idd-ext-legend" (sprintf "%s %d %d" placementStr rowIdx colIdx) subplotsDiv
-            |   None -> subplotsDiv
-        let subplotsDiv = addTable slotsStructure subplotsDiv
+                addAttribute "data-idd-ext-legend" (sprintf "%s %d %d" placementStr rowIdx colIdx) subplotsLegendholderDiv
+            |   None -> subplotsLegendholderDiv
+        let subplotsLegendholderDiv = addTable slotsStructure subplotsLegendholderDiv
+        let subplotsDiv =
+            subplotsDiv
+            |> addDiv subplotsLegendholderDiv
+
         Div subplotsDiv
-        
 
         (*
     let commonAxes subplots =

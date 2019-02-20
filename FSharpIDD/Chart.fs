@@ -167,5 +167,5 @@ module Chart =
     /// Sets whether the plot coordinates are shown in the tooltips of the chart
     let setIsTooltipPlotCoordsEnabled isEnabled chart = { chart with IsTooltipPlotCoordsEnabled = isEnabled }
 
-    /// Sets duration of the tooltip delay 
+    /// Sets duration of the tooltip delay in seconds
     let setTooltipDelay delay chart = { chart with TooltipDelay = Some delay }

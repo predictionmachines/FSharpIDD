@@ -76,6 +76,7 @@ let subplots1 =
             }
         | _ -> None
     let subplots = Subplots.createSubplots 2 2 initializer
+    let subplots = Subplots.setTitle "Common subplots name" subplots
     "Subplots",
     ["2x2 plots"],
     subplots
