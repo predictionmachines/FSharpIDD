@@ -113,3 +113,23 @@ let setSubplotExtLegendBottomTest =
     "setExternalLegend",
     ["There is a common legend to the bottom of the subplots grid"],
     subplots
+
+let setSubplotTestZeroMargin =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots
+        |> Subplots.setExternalLegend Right 0 0
+        |> Subplots.setMargins 0
+    "Zero margins in Subplots",
+    ["Subplots.setMargins 0"],
+    subplots
+    
+let setSubplotTest30Margin =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots
+        |> Subplots.setExternalLegend Right 0 0
+        |> Subplots.setMargins 30
+    "30px margins in Subplots",
+    ["Subplots.setMargins 30"],
+    subplots
