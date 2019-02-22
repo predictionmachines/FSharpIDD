@@ -87,8 +87,7 @@ let setSubplotTest =
         subplots |> Subplots.setSubplot 0 1 None
     "setSubplot",
     ["Subplots.setSubplot 0 1 None"],
-    subplots    
-
+    subplots
 
 let setSubplotSizeTest =    
     let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
@@ -133,3 +132,19 @@ let setSubplotTest30Margin =
     "30px margins in Subplots",
     ["Subplots.setMargins 30"],
     subplots
+
+let setSubplotsCommonVisibilityTest =
+    let initializer row column =
+        match row,column with
+        | 0,0 -> Some {
+                comparisonChart with
+                    IsLegendEnabled = LegendVisibility.Visible
+            }
+        | _ ->  
+            Some comparisonChart
+    let subplots =
+        Subplots.createSubplots 2 2 initializer
+        |> Subplots.setCommonVisibility true
+    "Manage visibility of a plots with a same name in Supblots via legend",
+    ["Subplots.setCommonVisibility true"],
+    subplots    

@@ -278,6 +278,7 @@ let getTestText() =
             SubplotsTests.setSubplotExtLegendBottomTest
             SubplotsTests.setSubplotTestZeroMargin
             SubplotsTests.setSubplotTest30Margin
+            SubplotsTests.setSubplotsCommonVisibilityTest
         ]
     
     let tests2 = List.mapi (fun i elem -> let testName, descrList, subplots = elem in (sprintf "%d. %s" (i+1) testName), descrList, HTML.ofSubplots subplots) subplotsTests
