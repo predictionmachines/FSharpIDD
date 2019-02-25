@@ -30,6 +30,8 @@ module Subplots =
             ExternalLegendSource: (int*int*Placement) option
             /// Margin between subplots in a subplots grid in pixels
             Margin: int
+            /// Ability not to display plots with a selected name in all of plots in the Subplots
+            CommonVisibility: bool
         }
 
     /// Constructs subplots instance with nrow rows and ncol columns, filling up with the charts provided by initializer function
@@ -51,6 +53,7 @@ module Subplots =
             ColumnsCount = ncol
             ExternalLegendSource = None
             Margin = 20
+            CommonVisibility = false
         }
     
     /// Adds/Replaces the particular chart in subplots
@@ -96,6 +99,13 @@ module Subplots =
         {
             subplots with
                 Title = Some title
+        }
+    
+    /// Sets the ability to manage same plot visibility in all of plots in the Subplots (equality by Plot name)
+    let setCommonVisibility plotVisibility subplots :Subplots =
+        {
+            subplots with
+                CommonVisibility = plotVisibility
         }
 
     /// the chart without axis and titles
@@ -289,6 +299,10 @@ module Subplots =
                 addAttribute "data-idd-ext-legend" (sprintf "%s %d %d" placementStr rowIdx colIdx) subplotsLegendholderDiv
             |   None -> subplotsLegendholderDiv
         let subplotsLegendholderDiv = addTable slotsStructure subplotsLegendholderDiv
+
+        let subplotsLegendholderDiv =
+            subplotsLegendholderDiv
+            |> addAttribute "data-idd-common-visibility" (sprintf "%b" subplots.CommonVisibility)
 
         let subplotsLegendholderDiv =
             subplotsLegendholderDiv
