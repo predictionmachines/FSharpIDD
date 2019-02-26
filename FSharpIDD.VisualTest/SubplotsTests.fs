@@ -133,3 +133,22 @@ let setSubplotTest30Margin =
     "30px margins in Subplots",
     ["Subplots.setMargins 30"],
     subplots
+    
+let setSubplotTestAxisBinding =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> if(r <> c) then Some (comparisonChart |> Chart.setXaxis Axis.Hidden) else Some (comparisonChart |> Chart.setYaxis Axis.Hidden))
+    let subplots =
+        subplots
+        |> Subplots.setSyncHorizontalAxes true
+        |> Subplots.setSyncVerticalAxes true
+    "Shared axes in the Subplot",
+    ["|> Subplots.setSharedHorizontalAxis true |> Subplots.setSharedVerticalAxis true"],
+    subplots
+    
+let setSubplotTestAxisHorizontalBinding =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots
+        |> Subplots.setSyncHorizontalAxes true
+    "Horizontal axes are shared in the Subplot",
+    ["|> Subplots.setSharedHorizontalAxis true"],
+    subplots

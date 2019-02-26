@@ -29,7 +29,11 @@ module Subplots =
             /// None indicates that external legend is not
             ExternalLegendSource: (int*int*Placement) option
             /// Margin between subplots in a subplots grid in pixels
-            Margin: int
+            Margin: int option
+            /// Every plot shares a horizontal axis with other plots in a column of the Subplot
+            SyncHorizontalAxes: bool option
+            /// Every plot shares a verical axis with other plots in a row of the Subplot
+            SyncVerticalAxes: bool option
         }
 
     /// Constructs subplots instance with nrow rows and ncol columns, filling up with the charts provided by initializer function
@@ -50,7 +54,9 @@ module Subplots =
             RowsCount = nrow
             ColumnsCount = ncol
             ExternalLegendSource = None
-            Margin = 20
+            Margin = Some 20
+            SyncHorizontalAxes = None
+            SyncVerticalAxes = None
         }
     
     /// Adds/Replaces the particular chart in subplots
@@ -72,7 +78,7 @@ module Subplots =
     let setMargins margin subplots =
         {
             subplots with
-                Margin = margin
+                Margin = Some margin
         }
     
     /// Enables the legend which is placed next to the subplots table.
@@ -96,6 +102,18 @@ module Subplots =
         {
             subplots with
                 Title = Some title
+        }
+
+    let setSyncHorizontalAxes value subplots : Subplots =
+        {
+            subplots with
+                SyncHorizontalAxes = Some value
+        }
+
+    let setSyncVerticalAxes value subplots : Subplots =
+        {
+            subplots with
+                SyncVerticalAxes = Some value
         }
 
     /// the chart without axis and titles
@@ -291,8 +309,25 @@ module Subplots =
         let subplotsLegendholderDiv = addTable slotsStructure subplotsLegendholderDiv
 
         let subplotsLegendholderDiv =
-            subplotsLegendholderDiv
-            |> addAttribute "data-idd-style" (sprintf "subplots-margin: %dpx; " subplots.Margin)
+            match subplots.Margin with
+            |   Some(margin) ->
+                subplotsLegendholderDiv
+                |> addAttribute "data-idd-style" (sprintf "subplots-margin: %dpx; " margin)
+            |   None -> subplotsLegendholderDiv
+
+        let subplotsLegendholderDiv =
+            match subplots.SyncHorizontalAxes with
+            |   Some(syncHorizontalAxes) ->
+                subplotsLegendholderDiv
+                |> addAttribute "data-idd-horizontal-binding" (sprintf "%b" syncHorizontalAxes)
+            |   None -> subplotsLegendholderDiv
+
+        let subplotsLegendholderDiv =
+            match subplots.SyncVerticalAxes with
+            |   Some(syncVerticalAxes) ->
+                subplotsLegendholderDiv
+                |> addAttribute "data-idd-vertical-binding" (sprintf "%b" syncVerticalAxes)
+            |   None -> subplotsLegendholderDiv
 
         let subplotsDiv =
             subplotsDiv
