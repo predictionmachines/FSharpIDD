@@ -10,7 +10,7 @@ module Subplots =
     open HtmlConverters
 
     /// A collection of charts organized into rectangular grid
-    type Subplots = 
+    type Subplots =
         {
             /// Common title
             Title: string option
@@ -30,6 +30,8 @@ module Subplots =
             ExternalLegendSource: (int*int*Placement) option
             /// Margin between subplots in a subplots grid in pixels
             Margin: int option
+            /// Ability not to display plots with a selected name in all of plots in the Subplots
+            CommonVisibility: bool
             /// Every plot shares a horizontal axis with other plots in a column of the Subplot
             SyncHorizontalAxes: bool option
             /// Every plot shares a verical axis with other plots in a row of the Subplot
@@ -54,6 +56,7 @@ module Subplots =
             RowsCount = nrow
             ColumnsCount = ncol
             ExternalLegendSource = None
+            CommonVisibility = false
             Margin = Some 20
             SyncHorizontalAxes = None
             SyncVerticalAxes = None
@@ -102,6 +105,13 @@ module Subplots =
         {
             subplots with
                 Title = Some title
+        }
+    
+    /// Sets the ability to manage same plot visibility in all of plots in the Subplots (equality by Plot name)
+    let setCommonVisibility plotVisibility subplots :Subplots =
+        {
+            subplots with
+                CommonVisibility = plotVisibility
         }
 
     let setSyncHorizontalAxes value subplots : Subplots =
@@ -307,7 +317,11 @@ module Subplots =
                 addAttribute "data-idd-ext-legend" (sprintf "%s %d %d" placementStr rowIdx colIdx) subplotsLegendholderDiv
             |   None -> subplotsLegendholderDiv
         let subplotsLegendholderDiv = addTable slotsStructure subplotsLegendholderDiv
-
+        
+        let subplotsLegendholderDiv =
+            subplotsLegendholderDiv
+            |> addAttribute "data-idd-common-visibility" (sprintf "%b" subplots.CommonVisibility)
+            
         let subplotsLegendholderDiv =
             match subplots.Margin with
             |   Some(margin) ->

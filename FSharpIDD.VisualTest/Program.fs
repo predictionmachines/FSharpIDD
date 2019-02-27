@@ -278,6 +278,7 @@ let getTestText() =
             SubplotsTests.setSubplotExtLegendBottomTest
             SubplotsTests.setSubplotTestZeroMargin
             SubplotsTests.setSubplotTest30Margin
+            SubplotsTests.setSubplotsCommonVisibilityTest
             SubplotsTests.setSubplotTestAxisBinding
             SubplotsTests.setSubplotTestAxisHorizontalBinding
         ]
