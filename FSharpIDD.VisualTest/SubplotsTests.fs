@@ -147,7 +147,16 @@ let setSubplotsCommonVisibilityTest =
         |> Subplots.setCommonVisibility true
     "Manage visibility of a plots with a same name in Supblots via legend",
     ["Subplots.setCommonVisibility true"],
-    subplots    
+    subplots
+
+let setSubplotsCommonVisibilityExternalLegendTest =
+    let subplots =
+        Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+        |> Subplots.setExternalLegend Right 0 0
+        |> Subplots.setCommonVisibility true
+    "Visibility of a plots with a same name in Supblots via external legend",
+    ["|> Subplots.setExternalLegend Right 0 0 |> Subplots.setCommonVisibility true"],
+    subplots
     
 let setSubplotTestAxisBinding =    
     let subplots = Subplots.createSubplots 2 2 (fun r c -> if(r <> c) then Some (comparisonChart |> Chart.setXaxis Axis.Hidden) else Some (comparisonChart |> Chart.setYaxis Axis.Hidden))
