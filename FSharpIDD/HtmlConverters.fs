@@ -29,13 +29,9 @@ module internal HtmlConverters =
                 // can't use string builder here as it is not transpilable with WebSharper                
                 let ticks_array = Array.ofSeq ticks
                 let labels_array = Array.ofSeq labels
-                let labels_seq_final =
-                    if((Array.length ticks_array) = (Array.length labels_array))
-                    then
-                        labels
-                    else
-                        Seq.append labels [""]
-                let str = Seq.fold2 (fun state tick label -> state + (sprintf "\t%f\t%s\n" tick label)) "ticks\tlabels\n" ticks labels_seq_final
+                let encoded_labels = Utils.encodeStringArrayBase64 labels_array                
+
+                let str = sprintf "ticks float64.1D %s\nlabels string.1D %s" (Utils.encodeFloat64ArrayBase64 ticks_array) encoded_labels                
                 str        
         match axis with
             |   Axis.Hidden -> Option.None
@@ -64,6 +60,7 @@ module internal HtmlConverters =
                     |> addAttribute "data-idd-placement" (placementToStr placement)
                     |> addAttribute "style" "position: relative;"
                     |> addAttribute "data-idd-style" tiltString
+                    |> addAttribute "data-idd-datasource" "InteractiveDataDisplay.readBase64"
                     |> addText (getDataDomWithTicksLabels ticks labels)
                 let axisNode = 
                     if (labelledAxisRecord.Angle = 0.0)

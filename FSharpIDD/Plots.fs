@@ -20,10 +20,11 @@ module Utils =
         base64str
 
     [<Inline "throw \"not NotImplementedException\"">]
-    let encodeStringSeqBase64 (data:string) =
-        let bytes = data |> System.Text.Encoding.ASCII.GetBytes
-        let base64str = System.Convert.ToBase64String bytes
-        base64str
+    let encodeStringArrayBase64 (data:string array) =
+        let bytes = data |> Array.map System.Text.Encoding.UTF8.GetBytes
+        let base64str = bytes |> Array.map System.Convert.ToBase64String 
+        let joinedBase64 = System.String.Join(",",base64str)
+        joinedBase64
 
 // Common parts for different plots
 
