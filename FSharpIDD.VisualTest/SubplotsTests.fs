@@ -98,6 +98,14 @@ let setSubplotSizeTest =
     ["|> Subplots.setSubplotSize 300 200"],
     subplots
 
+let setTitleNullTest =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots |> Subplots.setTitle null
+    "setTitle null",
+    ["The subplots don't have common title"],
+    subplots
+
 let setSubplotExtLegendRightTest =    
     let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
     let subplots =

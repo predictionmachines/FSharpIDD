@@ -82,11 +82,14 @@ module Subplots =
         }
     
     /// Sets the title for the whole subplots grid
+    /// Passing null removes the title
     let setTitle title subplots :Subplots =
+        let newTitle =
+            if title = null then None else Some title
         {
             subplots with
-                Title = Some title
-        }
+                Title = newTitle
+        }        
 
     /// the chart without axis and titles
     /// Used to be placed into the slot of subplots
