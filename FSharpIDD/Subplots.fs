@@ -10,7 +10,7 @@ module Subplots =
     open HtmlConverters
 
     /// A collection of charts organized into rectangular grid
-    type Subplots = 
+    type Subplots =
         {
             /// Common title
             Title: string option
@@ -27,7 +27,15 @@ module Subplots =
             ColumnsCount: int
             /// Which plot to use for externally placed legend
             /// None indicates that external legend is not
-            ExternalLegendSource: (int*int*Placement) option                
+            ExternalLegendSource: (int*int*Placement) option
+            /// Margin between subplots in a subplots grid in pixels
+            Margin: int option
+            /// Ability not to display plots with a selected name in all of plots in the Subplots
+            CommonVisibility: bool
+            /// Every plot shares a horizontal axis with other plots in a column of the Subplot
+            SyncHorizontalAxes: bool option
+            /// Every plot shares a verical axis with other plots in a row of the Subplot
+            SyncVerticalAxes: bool option
         }
 
     /// Constructs subplots instance with nrow rows and ncol columns, filling up with the charts provided by initializer function
@@ -48,6 +56,10 @@ module Subplots =
             RowsCount = nrow
             ColumnsCount = ncol
             ExternalLegendSource = None
+            CommonVisibility = false
+            Margin = Some 20
+            SyncHorizontalAxes = None
+            SyncVerticalAxes = None
         }
     
     /// Adds/Replaces the particular chart in subplots
@@ -63,6 +75,13 @@ module Subplots =
             subplots with
                 PlotWidth = width;
                 PlotHeight = height
+        }
+
+    /// Sets margins between subplots within a subplots grid
+    let setMargins margin subplots =
+        {
+            subplots with
+                Margin = Some margin
         }
     
     /// Enables the legend which is placed next to the subplots table.
@@ -89,7 +108,26 @@ module Subplots =
         {
             subplots with
                 Title = newTitle
-        }        
+        }
+    
+    /// Sets the ability to manage same plot visibility in all of plots in the Subplots (equality by Plot name)
+    let setCommonVisibility plotVisibility subplots :Subplots =
+        {
+            subplots with
+                CommonVisibility = plotVisibility
+        }
+
+    let setSyncHorizontalAxes value subplots : Subplots =
+        {
+            subplots with
+                SyncHorizontalAxes = Some value
+        }
+
+    let setSyncVerticalAxes value subplots : Subplots =
+        {
+            subplots with
+                SyncVerticalAxes = Some value
+        }
 
     /// the chart without axis and titles
     /// Used to be placed into the slot of subplots
@@ -190,14 +228,16 @@ module Subplots =
                 match placement with
                 |   Left ->
                     slotContent
-                    |> addAttribute "style" (sprintf "height: %dpx; display: flex; justify-content: flex-end; padding-left: 20px;" plotHeight)
+                    |> addAttribute "style" (sprintf "height: %dpx; display: flex; justify-content: flex-end;" plotHeight)
                     |> tryAddAxisTitle
                     |> tryAddAxis
+                    |> addAttribute "class" "idd-subplots-margin-left"
                 |   Bottom ->
                     slotContent
-                    |> addAttribute "style" (sprintf "width: %dpx; display: flex; flex-direction: column; justify-content: flex-start; margin-left: auto; margin-right: auto; padding-bottom: 20px;" plotWidth)                    
+                    |> addAttribute "style" (sprintf "width: %dpx; display: flex; flex-direction: column; justify-content: flex-start; margin-left: auto; margin-right: auto;" plotWidth)         
                     |> tryAddAxis
                     |> tryAddAxisTitle
+                    |> addAttribute "class" "idd-subplots-margin-bottom"
                 |   _   -> failwith "Not supported exception"
             Div slotContent
         |   Plot(bareChart) ->
@@ -280,6 +320,32 @@ module Subplots =
                 addAttribute "data-idd-ext-legend" (sprintf "%s %d %d" placementStr rowIdx colIdx) subplotsLegendholderDiv
             |   None -> subplotsLegendholderDiv
         let subplotsLegendholderDiv = addTable slotsStructure subplotsLegendholderDiv
+        
+        let subplotsLegendholderDiv =
+            subplotsLegendholderDiv
+            |> addAttribute "data-idd-common-visibility" (sprintf "%b" subplots.CommonVisibility)
+            
+        let subplotsLegendholderDiv =
+            match subplots.Margin with
+            |   Some(margin) ->
+                subplotsLegendholderDiv
+                |> addAttribute "data-idd-style" (sprintf "subplots-margin: %dpx; " margin)
+            |   None -> subplotsLegendholderDiv
+
+        let subplotsLegendholderDiv =
+            match subplots.SyncHorizontalAxes with
+            |   Some(syncHorizontalAxes) ->
+                subplotsLegendholderDiv
+                |> addAttribute "data-idd-horizontal-binding" (sprintf "%b" syncHorizontalAxes)
+            |   None -> subplotsLegendholderDiv
+
+        let subplotsLegendholderDiv =
+            match subplots.SyncVerticalAxes with
+            |   Some(syncVerticalAxes) ->
+                subplotsLegendholderDiv
+                |> addAttribute "data-idd-vertical-binding" (sprintf "%b" syncVerticalAxes)
+            |   None -> subplotsLegendholderDiv
+
         let subplotsDiv =
             subplotsDiv
             |> addDiv subplotsLegendholderDiv

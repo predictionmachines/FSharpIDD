@@ -87,8 +87,7 @@ let setSubplotTest =
         subplots |> Subplots.setSubplot 0 1 None
     "setSubplot",
     ["Subplots.setSubplot 0 1 None"],
-    subplots    
-
+    subplots
 
 let setSubplotSizeTest =    
     let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
@@ -120,4 +119,68 @@ let setSubplotExtLegendBottomTest =
         subplots |> Subplots.setExternalLegend Bottom 0 0
     "setExternalLegend",
     ["There is a common legend to the bottom of the subplots grid"],
+    subplots
+
+let setSubplotTestZeroMargin =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots
+        |> Subplots.setExternalLegend Right 0 0
+        |> Subplots.setMargins 0
+    "Zero margins in Subplots",
+    ["Subplots.setMargins 0"],
+    subplots
+    
+let setSubplotTest30Margin =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots
+        |> Subplots.setExternalLegend Right 0 0
+        |> Subplots.setMargins 30
+    "30px margins in Subplots",
+    ["Subplots.setMargins 30"],
+    subplots
+
+let setSubplotsCommonVisibilityTest =
+    let initializer row column =
+        match row,column with
+        | 0,0 -> Some {
+                comparisonChart with
+                    IsLegendEnabled = LegendVisibility.Visible
+            }
+        | _ ->  
+            Some comparisonChart
+    let subplots =
+        Subplots.createSubplots 2 2 initializer
+        |> Subplots.setCommonVisibility true
+    "Manage visibility of a plots with a same name in Supblots via legend",
+    ["Subplots.setCommonVisibility true"],
+    subplots
+
+let setSubplotsCommonVisibilityExternalLegendTest =
+    let subplots =
+        Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+        |> Subplots.setExternalLegend Right 0 0
+        |> Subplots.setCommonVisibility true
+    "Visibility of a plots with a same name in Supblots via external legend",
+    ["|> Subplots.setExternalLegend Right 0 0 |> Subplots.setCommonVisibility true"],
+    subplots
+    
+let setSubplotTestAxisBinding =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> if(r <> c) then Some (comparisonChart |> Chart.setXaxis Axis.Hidden) else Some (comparisonChart |> Chart.setYaxis Axis.Hidden))
+    let subplots =
+        subplots
+        |> Subplots.setSyncHorizontalAxes true
+        |> Subplots.setSyncVerticalAxes true
+    "Shared axes in the Subplot",
+    ["|> Subplots.setSharedHorizontalAxis true |> Subplots.setSharedVerticalAxis true"],
+    subplots
+    
+let setSubplotTestAxisHorizontalBinding =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots
+        |> Subplots.setSyncHorizontalAxes true
+    "Horizontal axes are shared in the Subplot",
+    ["|> Subplots.setSharedHorizontalAxis true"],
     subplots

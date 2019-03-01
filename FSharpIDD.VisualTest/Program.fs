@@ -205,6 +205,14 @@ let getTestText() =
         ],
         ChartDelay1Polyline
 
+    let iddIssue161 =
+        let xs = Array.init 50 (fun i -> float(i))
+        let means = Array.map (fun x -> x*300.0 % 3000.0) xs
+        let xticks  = Array.map (fun i -> sprintf "EtOH = %1.6f" i ) xs
+
+        Chart.Empty
+        |> Chart.addMarkers (Markers.createMarkers xs means)
+        |> Chart.setXaxis (Chart.createTiltedLabelledAxis xs xticks 90.0)
     
     let chartTests = 
         [
@@ -265,6 +273,8 @@ let getTestText() =
             basicGradientHeatmapTest
             basicDescreteHeatmapTest
             corrMapTest
+            // issues
+            ("Idd issue #161",[ "label axis must present" ], iddIssue161)
         ]
 
     let tests1 = List.mapi (fun i elem -> let testName, descrList, chart = elem in (sprintf "%d. %s" (i+1) testName), descrList, HTML.ofChart chart) chartTests
@@ -276,7 +286,13 @@ let getTestText() =
             SubplotsTests.setSubplotSizeTest
             SubplotsTests.setSubplotExtLegendRightTest
             SubplotsTests.setSubplotExtLegendBottomTest
-            SubplitsTests.setTitleNullTest
+			SubplitsTests.setTitleNullTest
+            SubplotsTests.setSubplotTestZeroMargin
+            SubplotsTests.setSubplotTest30Margin
+            SubplotsTests.setSubplotsCommonVisibilityTest
+            SubplotsTests.setSubplotsCommonVisibilityExternalLegendTest
+            SubplotsTests.setSubplotTestAxisBinding
+            SubplotsTests.setSubplotTestAxisHorizontalBinding
         ]
     
     let tests2 = List.mapi (fun i elem -> let testName, descrList, subplots = elem in (sprintf "%d. %s" (i+1) testName), descrList, HTML.ofSubplots subplots) subplotsTests
@@ -298,7 +314,8 @@ let main argv =
     let template = System.IO.File.ReadAllText "template.html"
     let generatedDiv = getTestText()
     let html = template.Replace("<%PLACEHOLDER%>", generatedDiv)
-    printfn "%s" generatedDiv
+    printfn "Spawning the browser..."
+    // printfn "%s" generatedDiv
     let writer = System.IO.File.CreateText("visualTests.html")
     writer.Write(html)
     writer.Close()
