@@ -19,7 +19,7 @@ module Utils =
         let base64str = System.Convert.ToBase64String bytes
         base64str
 
-    [<Inline "throw \"not NotImplementedException\"">]
+    [<Inline "$0.map(btoa).join(',')">]
     let encodeStringArrayBase64 (data:string array) =
         let bytes = data |> Array.map System.Text.Encoding.UTF8.GetBytes
         let base64str = bytes |> Array.map System.Convert.ToBase64String 
