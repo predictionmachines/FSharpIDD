@@ -286,7 +286,7 @@ let getTestText() =
             SubplotsTests.setSubplotSizeTest
             SubplotsTests.setSubplotExtLegendRightTest
             SubplotsTests.setSubplotExtLegendBottomTest
-			SubplitsTests.setTitleNullTest
+            SubplotsTests.setTitleNullTest
             SubplotsTests.setSubplotTestZeroMargin
             SubplotsTests.setSubplotTest30Margin
             SubplotsTests.setSubplotsCommonVisibilityTest

@@ -56,7 +56,7 @@ module Subplots =
             RowsCount = nrow
             ColumnsCount = ncol
             ExternalLegendSource = None
-            CommonVisibility = false
+            CommonVisibility = true
             Margin = Some 20
             SyncHorizontalAxes = None
             SyncVerticalAxes = None
@@ -116,17 +116,19 @@ module Subplots =
             subplots with
                 CommonVisibility = plotVisibility
         }
-
-    let setSyncHorizontalAxes value subplots : Subplots =
+    
+    /// Toggles whether all of the plots in subplots are synchronized along horizontal axis
+    let setSyncHorizontalAxes enabled subplots : Subplots =
         {
             subplots with
-                SyncHorizontalAxes = Some value
+                SyncHorizontalAxes = Some enabled
         }
-
-    let setSyncVerticalAxes value subplots : Subplots =
+    
+    /// Toggles whether all of the plots in subplots are synchronized along horizontal axis
+    let setSyncVerticalAxes enabled subplots : Subplots =
         {
             subplots with
-                SyncVerticalAxes = Some value
+                SyncVerticalAxes = Some enabled
         }
 
     /// the chart without axis and titles
