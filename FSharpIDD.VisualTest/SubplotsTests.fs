@@ -194,7 +194,7 @@ let subplotsIssue161 =
         Chart.Empty
         |> Chart.addMarkers (Markers.createMarkers xs means)
         |> Chart.setXaxis (Chart.createTiltedLabelledAxis xs xticks 90.0)
-    let subplots = Subplots.createSubplots 1 2 (fun r c -> Some chart)
+    let subplots = Subplots.createSubplots 1 1 (fun r c -> Some chart)
     "Issue161 in subplots",
     ["Horizonotal label axis must be initialized (labels rotated)"],
     subplots
