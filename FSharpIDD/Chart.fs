@@ -37,15 +37,6 @@ module Chart =
     |   Numeric of ScientificNotationEnabled:bool
     /// Labelled axis. Uses array with string labels(lables[]) and array of numerical values (ticks[]), where these labels will be placed. Also has an angle parameter
     |   Labelled of LabelledAxisRecord
-
-    /// Creates a labelled axis using the specified ticks and labels arrays, tilt angle and forceLabelsVisibility flag
-    let createLabelledAxisWithParams ticks labels angle forceLabelsVisibility = 
-        Labelled {
-            Ticks = ticks
-            Labels = labels
-            Angle = angle
-            ForceLabelsVisibility = forceLabelsVisibility
-        }
     
     /// Creates a labelled axis using the specified ticks and labels arrays, tilt angle
     let createTiltedLabelledAxis ticks labels angle = 
