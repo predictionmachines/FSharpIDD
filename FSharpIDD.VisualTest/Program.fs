@@ -273,6 +273,8 @@ let getTestText() =
             basicGradientHeatmapTest
             basicDescreteHeatmapTest
             corrMapTest
+            allLabelsHorizontalTest
+            allLabelsVerticalTest
             // issues
             ("Idd issue #161",[ "label axis must present" ], iddIssue161)
         ]

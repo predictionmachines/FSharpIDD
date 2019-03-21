@@ -18,17 +18,17 @@ open WebSharper
 module Chart =        
     open FSharpIDD.Plots
 
+    /// Holds the settings of a labelled axis 
     type LabelledAxisRecord = {
+        /// either positions of labels (in case ticks length == labels length) or positions of named interval bounds 
         Ticks: float seq
+        /// labels to present on an axis
         Labels: string seq
+        /// tilt angle (in degrees) of each label. Positive angle - clockwise
         Angle: float
+        /// Whether to show all labels regardless of the zoom level and visible rect
+        ForceLabelsVisibility: bool
     }
-
-    /// Sets ticks and labels of a labelled axis
-    let setTicksLabels ticks labels labelledAxis =  { labelledAxis with Ticks = ticks; Labels = labels }
-
-    /// Sets tilt angle of labels on a labelled axis
-    let setLabelsAngle angle labelledAxis =  { labelledAxis with Angle = angle }
 
     type Axis = 
     /// The axis is disabled (not visible)
@@ -44,6 +44,7 @@ module Chart =
             Ticks = ticks
             Labels = labels
             Angle = angle
+            ForceLabelsVisibility = false
         }
     
     /// Creates a labelled axis using the specified ticks and labels arrays
@@ -52,8 +53,24 @@ module Chart =
             Ticks = ticks
             Labels = labels
             Angle = 0.0
+            ForceLabelsVisibility = false
         }
-    
+        
+    /// Sets a tilt angle of an each label on a labelled axis
+    let setLabelsAngle angle labelledAxis =
+        match labelledAxis with
+        |   Labelled labelledAxisRecord ->
+                Labelled { labelledAxisRecord with Angle = angle}
+        |   _ ->
+           failwith "Force labels visibility can be set only on a labelled axis"
+
+    /// Sets whether to force visibility of all labels on the axis or not
+    let setLabelsVisibility forceLabelsVisibility labelledAxis =
+        match labelledAxis with
+        |   Labelled labelledAxisRecord ->
+                Labelled { labelledAxisRecord with ForceLabelsVisibility = forceLabelsVisibility }
+        |   _ ->
+           failwith "Force labels visibility can be set only on a labelled axis"
 
     type GridLines =
     |   Disabled

@@ -1,3 +1,7 @@
+### 0.4.3
+New features:
+ - labelled axis labels visibility can be forced
+
 ### 0.4.2
 
 New features:
