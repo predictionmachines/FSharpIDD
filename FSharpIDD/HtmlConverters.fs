@@ -47,7 +47,7 @@ module internal HtmlConverters =
                 
                 Some (axisNode, id)
             |   Axis.Labelled labelledAxisRecord ->
-                let (ticks, labels, angle) = labelledAxisRecord.Ticks, labelledAxisRecord.Labels, labelledAxisRecord.Angle
+                let (ticks, labels, angle, forceLabelsVisibility) = labelledAxisRecord.Ticks, labelledAxisRecord.Labels, labelledAxisRecord.Angle, labelledAxisRecord.ForceLabelsVisibility
                 let id = Utils.getUniqueId()
                 let tiltString = 
                     if (labelledAxisRecord.Angle = 0.0)
@@ -66,6 +66,7 @@ module internal HtmlConverters =
                     if (labelledAxisRecord.Angle = 0.0)
                     then axisNode
                     else (axisNode |> addAttribute "data-idd-style" ("rotate: true; rotateAngle: " + (sprintf "%f;" labelledAxisRecord.Angle)))
+                let axisNode = if forceLabelsVisibility then addAttribute "data-idd-force-labels-visibility" "true" axisNode else axisNode
                 Some(axisNode,id)
 
     let vertAxisLabelToHtmlStructue label placement =

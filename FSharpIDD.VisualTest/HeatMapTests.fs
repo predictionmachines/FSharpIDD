@@ -73,3 +73,32 @@ let corrMapTest =
             TooltipDelay = Some 0.0
      }    
     |> Chart.addHeatmap corrMap
+    
+let labels7 = [ "one"; "two"; "three"; "four"; "five"; "six"; "seven" ]
+let labelsRev7 = List.rev labels7
+
+let allLabelsHorizontalTest =
+    "Force labels visibility on horizontal axis",
+    [    
+        "|> setLabelsVisibility true"
+        "All labels are visible regardless of the zoom level on the horizontal axis"
+    ],
+     {
+        Empty with
+            Xaxis = (createTiltedLabelledAxis ticks labels7 90.0) |> setLabelsVisibility true
+            Yaxis = createLabelledAxis ticks labelsRev7
+     }    
+    |> Chart.addHeatmap corrMap
+
+let allLabelsVerticalTest =
+    "Force labels visibility on vertical axis",
+    [    
+        "|> setLabelsVisibility true"
+        "All labels are visible regardless of the zoom level on the vertical axis"
+    ],
+     {
+        Empty with
+            Xaxis = createTiltedLabelledAxis ticks labels7 90.0
+            Yaxis = (createLabelledAxis ticks labelsRev7) |> setLabelsVisibility true
+     }    
+    |> Chart.addHeatmap corrMap

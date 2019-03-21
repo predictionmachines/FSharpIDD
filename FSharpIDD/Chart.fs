@@ -22,13 +22,16 @@ module Chart =
         Ticks: float seq
         Labels: string seq
         Angle: float
+        ForceLabelsVisibility: bool
     }
 
     /// Sets ticks and labels of a labelled axis
-    let setTicksLabels ticks labels labelledAxis =  { labelledAxis with Ticks = ticks; Labels = labels }
+    let setTicksLabels ticks labels labelledAxisRecord = { labelledAxisRecord with Ticks = ticks; Labels = labels }
 
     /// Sets tilt angle of labels on a labelled axis
-    let setLabelsAngle angle labelledAxis =  { labelledAxis with Angle = angle }
+    let setLabelledAxisLabelsAngle angle labelledAxisRecord = { labelledAxisRecord with Angle = angle }
+
+    let setForceLabelsVisibility forceLabelsVisibility labelledAxisRecord = { labelledAxisRecord with ForceLabelsVisibility = forceLabelsVisibility }
 
     type Axis = 
     /// The axis is disabled (not visible)
@@ -44,6 +47,16 @@ module Chart =
             Ticks = ticks
             Labels = labels
             Angle = angle
+            ForceLabelsVisibility = false
+        }
+
+    /// Creates a labelled axis using the specified ticks and labels arrays, tilt angle and forceLabelsVisibility flag
+    let createLabelledAxisWithParams ticks labels angle forceLabelsVisibility = 
+        Labelled {
+            Ticks = ticks
+            Labels = labels
+            Angle = angle
+            ForceLabelsVisibility = forceLabelsVisibility
         }
     
     /// Creates a labelled axis using the specified ticks and labels arrays
@@ -52,8 +65,25 @@ module Chart =
             Ticks = ticks
             Labels = labels
             Angle = 0.0
+            ForceLabelsVisibility = false
         }
-    
+        
+    /// Sets tilt angle of labels on a labelled axis
+    let setLabelsAngle angle labelledAxis =
+        Labelled {
+            Ticks = labelledAxis.Ticks
+            Labels = labelledAxis.Labels
+            Angle = angle
+            ForceLabelsVisibility = labelledAxis.ForceLabelsVisibility
+        }
+
+    let setLabelsVisibility forceLabelsVisibility labelledAxis =
+        match labelledAxis with
+        |   Axis.Labelled labelledAxisRecord ->
+                let (ticks, labels, angle) = labelledAxisRecord.Ticks, labelledAxisRecord.Labels, labelledAxisRecord.Angle
+                createLabelledAxisWithParams ticks labels angle forceLabelsVisibility
+        |   _ ->
+           failwith "Force labels visibility can be set only on a labelled axis"
 
     type GridLines =
     |   Disabled
