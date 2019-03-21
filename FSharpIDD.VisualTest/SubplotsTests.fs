@@ -97,6 +97,14 @@ let setSubplotSizeTest =
     ["|> Subplots.setSubplotSize 300 200"],
     subplots
 
+let setTitleNullTest =    
+    let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
+    let subplots =
+        subplots |> Subplots.setTitle null
+    "setTitle null",
+    ["The subplots don't have common title"],
+    subplots
+
 let setSubplotExtLegendRightTest =    
     let subplots = Subplots.createSubplots 2 2 (fun r c -> Some comparisonChart)
     let subplots =
@@ -175,4 +183,18 @@ let setSubplotTestAxisHorizontalBinding =
         |> Subplots.setSyncHorizontalAxes true
     "Horizontal axes are shared in the Subplot",
     ["|> Subplots.setSharedHorizontalAxis true"],
+    subplots
+
+let subplotsIssue161 =
+    let xs = Array.init 50 (fun i -> float(i))
+    let means = Array.map (fun x -> x*300.0 % 3000.0) xs
+    let xticks  = Array.map (fun i -> sprintf "EtOH = %1.6f" i ) xs
+
+    let chart =
+        Chart.Empty
+        |> Chart.addMarkers (Markers.createMarkers xs means)
+        |> Chart.setXaxis (Chart.createTiltedLabelledAxis xs xticks 90.0)
+    let subplots = Subplots.createSubplots 1 1 (fun r c -> Some chart)
+    "Issue161 in subplots",
+    ["Horizonotal label axis must be initialized (labels rotated)"],
     subplots

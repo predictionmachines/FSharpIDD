@@ -18,20 +18,17 @@ open WebSharper
 module Chart =        
     open FSharpIDD.Plots
 
+    /// Holds the settings of a labelled axis 
     type LabelledAxisRecord = {
+        /// either positions of labels (in case ticks length == labels length) or positions of named interval bounds 
         Ticks: float seq
+        /// labels to present on an axis
         Labels: string seq
+        /// tilt angle (in degrees) of each label. Positive angle - clockwise
         Angle: float
+        /// Whether to show all labels regardless of the zoom level and visible rect
         ForceLabelsVisibility: bool
     }
-
-    /// Sets ticks and labels of a labelled axis
-    let setTicksLabels ticks labels labelledAxisRecord = { labelledAxisRecord with Ticks = ticks; Labels = labels }
-
-    /// Sets tilt angle of labels on a labelled axis
-    let setLabelledAxisLabelsAngle angle labelledAxisRecord = { labelledAxisRecord with Angle = angle }
-
-    let setForceLabelsVisibility forceLabelsVisibility labelledAxisRecord = { labelledAxisRecord with ForceLabelsVisibility = forceLabelsVisibility }
 
     type Axis = 
     /// The axis is disabled (not visible)
@@ -40,15 +37,6 @@ module Chart =
     |   Numeric of ScientificNotationEnabled:bool
     /// Labelled axis. Uses array with string labels(lables[]) and array of numerical values (ticks[]), where these labels will be placed. Also has an angle parameter
     |   Labelled of LabelledAxisRecord
-    
-    /// Creates a labelled axis using the specified ticks and labels arrays, tilt angle
-    let createTiltedLabelledAxis ticks labels angle = 
-        Labelled {
-            Ticks = ticks
-            Labels = labels
-            Angle = angle
-            ForceLabelsVisibility = false
-        }
 
     /// Creates a labelled axis using the specified ticks and labels arrays, tilt angle and forceLabelsVisibility flag
     let createLabelledAxisWithParams ticks labels angle forceLabelsVisibility = 
@@ -57,6 +45,15 @@ module Chart =
             Labels = labels
             Angle = angle
             ForceLabelsVisibility = forceLabelsVisibility
+        }
+    
+    /// Creates a labelled axis using the specified ticks and labels arrays, tilt angle
+    let createTiltedLabelledAxis ticks labels angle = 
+        Labelled {
+            Ticks = ticks
+            Labels = labels
+            Angle = angle
+            ForceLabelsVisibility = false
         }
     
     /// Creates a labelled axis using the specified ticks and labels arrays
@@ -68,20 +65,19 @@ module Chart =
             ForceLabelsVisibility = false
         }
         
-    /// Sets tilt angle of labels on a labelled axis
+    /// Sets a tilt angle of an each label on a labelled axis
     let setLabelsAngle angle labelledAxis =
-        Labelled {
-            Ticks = labelledAxis.Ticks
-            Labels = labelledAxis.Labels
-            Angle = angle
-            ForceLabelsVisibility = labelledAxis.ForceLabelsVisibility
-        }
+        match labelledAxis with
+        |   Labelled labelledAxisRecord ->
+                Labelled { labelledAxisRecord with Angle = angle}
+        |   _ ->
+           failwith "Force labels visibility can be set only on a labelled axis"
 
+    /// Sets whether to force visibility of all labels on the axis or not
     let setLabelsVisibility forceLabelsVisibility labelledAxis =
         match labelledAxis with
-        |   Axis.Labelled labelledAxisRecord ->
-                let (ticks, labels, angle) = labelledAxisRecord.Ticks, labelledAxisRecord.Labels, labelledAxisRecord.Angle
-                createLabelledAxisWithParams ticks labels angle forceLabelsVisibility
+        |   Labelled labelledAxisRecord ->
+                Labelled { labelledAxisRecord with ForceLabelsVisibility = forceLabelsVisibility }
         |   _ ->
            failwith "Force labels visibility can be set only on a labelled axis"
 
